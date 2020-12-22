@@ -1,8 +1,24 @@
 
+.zero-padding {
+    padding-left: 0;
+}
+
 .experiment-header {
-    padding-left: 12px;
     margin-top: 20px;
     margin-bottom: 0px;
+}
+
+.waveform {
+    background: transparent;
+}
+
+.audio-player {
+    margin: 10px 0px;
+}
+
+.audio-grid {
+    /*max-height: 300px;*/
+    overflow-y: auto;
 }
 
 .parameter-table {

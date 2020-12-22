@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {ReactNode, useState} from 'react';
 import axios from 'axios';
 
 import './style.css';
@@ -24,7 +24,7 @@ interface ExperimentState {
 }
 
 
-const ExperimentHeader: React.FunctionComponent<{ experimentId: ParamValue }> = ({experimentId}) => {
+const ExperimentHeader: React.FC<{ experimentId: ParamValue }> = ({experimentId}) => {
     return (
         <h4 className={"uk-heading-small"}>
             {experimentId}
@@ -32,7 +32,7 @@ const ExperimentHeader: React.FunctionComponent<{ experimentId: ParamValue }> = 
     )
 };
 
-const ParameterRow: React.FunctionComponent<HParamRow> = ({name, value}) => {
+const ParameterRow: React.FC<HParamRow> = ({name, value}) => {
     return (
         <tr>
             <td className={"uk-width-1-5"}>{name}</td>
@@ -41,7 +41,7 @@ const ParameterRow: React.FunctionComponent<HParamRow> = ({name, value}) => {
     )
 };
 
-const ParameterTable: React.FunctionComponent<{ tableName: string, params: ParamDict }> = ({tableName, params}) => {
+const ParameterTable: React.FC<{ tableName: string, params: ParamDict }> = ({tableName, params}) => {
 
     const [displayed, setDisplay] = useState(false);
 
@@ -70,6 +70,40 @@ const ParameterTable: React.FunctionComponent<{ tableName: string, params: Param
 };
 
 
+type AudioFiles = Array<string>;
+
+
+class WaveForm extends React.Component<{ file: string, experimentId: string }> {
+
+    render() {
+        const file = this.props.file;
+        const experimentId = this.props.experimentId;
+        return (
+            <div key={file} id={"container"}>
+                <legend>{file}</legend>
+                <audio className={"audio-player"}
+                       controls
+                       src={"http://localhost:5000/audio/" + experimentId + "/" + file}/>
+            </div>
+        )
+    }
+}
+
+const AudioGrid: React.FC<{ experimentId: ParamValue, files: AudioFiles }> = ({experimentId, files}) => {
+    const audios: Array<JSX.Element> = [];
+    files.map(file => {
+        audios.push(
+            <WaveForm file={file}
+                      experimentId={typeof experimentId === "string" ? experimentId : experimentId.toString()}/>
+        )
+    });
+    return (
+        <div className={"audio-grid uk-flex uk-flex-wrap uk-grid-small uk-child-width-1-3"}>
+            {audios}
+        </div>
+    )
+};
+
 class Experiment extends React.Component<ExperimentProps, ExperimentState> {
 
     state: ExperimentState = {
@@ -88,6 +122,7 @@ class Experiment extends React.Component<ExperimentProps, ExperimentState> {
         return (
             <div>
                 <ExperimentHeader experimentId={this.state.properties.id}/>
+                <AudioGrid experimentId={this.state.properties.id} files={this.state.audios}/>
                 <ul className={"uk-accordion"}>
                     <ParameterTable tableName={"Properties"} params={this.state.properties}/>
                     <ParameterTable tableName={"Hparams"} params={this.state.hparams}/>
