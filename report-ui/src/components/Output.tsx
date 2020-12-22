@@ -8,7 +8,7 @@ interface IOutput {
 
 class Output extends React.Component<IOutput> {
     render() {
-        const html = require("../data/babys/B-1/audio/gen_0_0.wav.html");
+        const html = require("/tmp/neptune-server/MOD-32/data.json");
         const audioSource = {__html: html};
         return (
             <div dangerouslySetInnerHTML={audioSource}/>

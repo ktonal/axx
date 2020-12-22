@@ -44,12 +44,10 @@ def get_experiment_data(namespace, name, exp_id):
     project = session.get_project(namespace + "/" + name)
     exp = project.get_experiments(id=exp_id)[0]
 
-    response = dict(audios=[], hparams={}, tags=[], properties={}, system_properties={}, logs=None)
+    response = dict(audios=[], hparams={}, properties={})
     # get what we can from neptune
-    response["system_properties"] = exp.get_system_properties()
-    response["properties"] = exp.get_properties()
+    response["properties"] = exp.get_system_properties()
     response["hparams"] = exp.get_parameters()
-    response["tags"] = exp.get_tags()
 
     destination = os.path.join(PUBLIC_ROOT, exp_id)
     # clean it up
@@ -75,7 +73,7 @@ def get_experiment_data(namespace, name, exp_id):
             response["audios"] = os.listdir(os.path.join(destination, folder))
         elif folder == "logs":
             # cache the path to serve tensorboard later
-            response["logs"] = os.path.join(destination, folder)
+            response["properties"].setdefault("logs", os.path.join(destination, folder))
             # maybe the experiment was run offline...
             if not response["hparams"]:
                 hparams_path = os.path.join(destination, folder, "meta_tags.csv")
