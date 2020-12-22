@@ -61,7 +61,7 @@ const ParameterTable: React.FC<{ tableName: string, params: ParamDict }> = ({tab
                 {displayed &&
                 <div className={"uk-accordion-content"}>
                     <table className="uk-table uk-table-small uk-table-divider uk-text-nowrap parameter-table ">
-                        <tbody>{body}</tbody>
+                        <tbody >{body}</tbody>
                     </table>
                 </div>}
             </li>
@@ -79,7 +79,7 @@ class WaveForm extends React.Component<{ file: string, experimentId: string }> {
         const file = this.props.file;
         const experimentId = this.props.experimentId;
         return (
-            <div key={file} id={"container"}>
+            <div key={file}>
                 <legend>{file}</legend>
                 <audio className={"audio-player"}
                        controls
@@ -98,7 +98,7 @@ const AudioGrid: React.FC<{ experimentId: ParamValue, files: AudioFiles }> = ({e
         )
     });
     return (
-        <div className={"audio-grid uk-flex uk-flex-wrap uk-grid-small uk-child-width-1-3"}>
+        <div className={"audio-grid"}>
             {audios}
         </div>
     )
@@ -122,11 +122,15 @@ class Experiment extends React.Component<ExperimentProps, ExperimentState> {
         return (
             <div>
                 <ExperimentHeader experimentId={this.state.properties.id}/>
-                <AudioGrid experimentId={this.state.properties.id} files={this.state.audios}/>
-                <ul className={"uk-accordion"}>
-                    <ParameterTable tableName={"Properties"} params={this.state.properties}/>
-                    <ParameterTable tableName={"Hparams"} params={this.state.hparams}/>
-                </ul>
+                <div className={""}>
+                    <h4 className={"uk-h4"}>Outputs</h4>
+
+                    <AudioGrid experimentId={this.state.properties.id} files={this.state.audios}/>
+                    <ul className={"uk-accordion parameter-table"}>
+                        <ParameterTable tableName={"Properties"} params={this.state.properties}/>
+                        <ParameterTable tableName={"Hparams"} params={this.state.hparams}/>
+                    </ul>
+                </div>
             </div>
         )
     }

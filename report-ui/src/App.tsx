@@ -6,7 +6,7 @@ import Experiment from "./components/Experiment";
 
 function App() {
   return (
-    <div className="uk-container uk-container-small uk-position-relative">
+    <div className="uk-container medium uk-position-relative">
       <Experiment experimentId={"MOD-32"}/>
     </div>
   );
