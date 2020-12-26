@@ -54,25 +54,32 @@ class ProjectCard extends React.Component<ProjectProps, ProjectState> {
                     </span>
                 </li>)
         })
+        if (experiments.length === 0) {
+            experiments.push(<p>{"-- this project is empty --"}</p>)
+        }
         return (
             <div className={"uk-card uk-card-default-uk-card-body"}>
-                <ul className={"uk-nav uk-nav-default uk-nav-parent-icon"}>
-                    <li className={"uk-active uk-parent"}>
-                    <span
+                <ul className={"uk-nav uk-nav-default"}>
+                    <li className={"uk-active project-name"}
                         onClick={() => this.setState({active: !this.state.active})}>
                         {this.props.name.split("/")[1]}
-                        <span className={"uk-icon project-status"}
+                        <div className={"project-icons"}>
+                            <span className={"uk-icon"}
+                                  data-uk-icon={this.state.active ? "chevron-down" : "chevron-left"}/>
+                            <span className={"uk-icon project-status"}
                                   onClick={this.downloadProject}
                                   data-uk-icon={"download"}/>
-                        {this.state.isLoading ?
-                            <div data-uk-spinner={"ratio: .5"} className={"project-status"}/>
-                            : null}
-                        {this.state.onDisk ?
+                            {this.state.isLoading &&
+                            <div data-uk-spinner={"ratio: .5"} className={"project-status"}/>}
+                            {this.state.onDisk &&
                             <span className={"uk-icon project-status"}
-                                  data-uk-icon={"check"}/>
-                            : null}
-
-                    </span>
+                                  data-uk-icon={"check"}/>}
+                            {(!this.state.onDisk && !this.state.isLoading) &&
+                            <span className={"uk-icon project-status"}
+                                  data-uk-icon={"close"}/>}
+                        </div>
+                    </li>
+                    <li className={"uk-parent"}>
                         <ul className={"uk-nav-sub"}>
                             {this.state.active && experiments}
                         </ul>
