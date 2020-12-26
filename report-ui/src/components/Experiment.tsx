@@ -1,4 +1,4 @@
-import React  from "react";
+import React from "react";
 import axios from 'axios';
 
 import Waveform from "./Waveform";
@@ -28,20 +28,31 @@ export default class Experiment extends React.Component<ExperimentIdentifier, Ex
             hparams: [],
             properties: [],
         }
+        this.getExperimentData = this.getExperimentData.bind(this);
     }
+
+    componentDidMount() {
+        if (this.props.projectName && this.props.id) {
+            this.getExperimentData()
+        }
+    };
 
     componentDidUpdate() {
         if ((this.props.projectName && this.props.id) && (this.state.id !== this.props.id)) {
-            axios.get("http://localhost:5000/summary/" + this.props.projectName + "/" + this.props.id).then(
-                response => this.setState({
-                    projectName: this.props.projectName,
-                    id: this.props.id,
-                    audios: response.data.audios,
-                    hparams: response.data.hparams,
-                    properties: response.data.properties
-                })
-            )
+            this.getExperimentData()
         }
+    };
+
+    getExperimentData() {
+        axios.get("http://localhost:5000/summary/" + this.props.projectName + "/" + this.props.id).then(
+            response => this.setState({
+                projectName: this.props.projectName,
+                id: this.props.id,
+                audios: response.data.audios,
+                hparams: response.data.hparams,
+                properties: response.data.properties
+            })
+        )
     }
 
     render() {
@@ -56,7 +67,6 @@ export default class Experiment extends React.Component<ExperimentIdentifier, Ex
                 <hr></hr>
             </React.Fragment>
         ))
-        console.log("PROPS", this.state.properties.length)
         return (
             <div>
                 {Object.keys(this.state.properties).length > 0 ?

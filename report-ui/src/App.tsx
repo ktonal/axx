@@ -21,17 +21,18 @@ export default class App extends React.Component<{ }, {projectName: string, id: 
         const name = this.state.projectName;
         const id = this.state.id;
         return (
-            <div className={"uk-nav uk-nav-default"}>
-                <h3 className={"uk-nav-header "}
-                    style={{textAlign: "right"}}>
-                    {"|{ A X X }|"}
-                </h3>
-                <div className="uk-container uk-container-large uk-width-expand App">
+            <div className={"App"}>
+                <div className={"nav-main uk-nav uk-nav-default"}>
+                    <h3 id={"logo"}>
+                        {"|{ A X X }|"}
+                    </h3>
+                </div>
+                <div className="uk-container uk-container-large uk-width-expand">
                     <Projects onChange={this.onExperimentClick}/>
                     {this.state.projectName ?
                         <Experiment projectName={name} id={id}/>
                         : <div className={"uk-text-center"} style={
-                            {position: "absolute", top: "30%", left: "40%", height: "500px"}}
+                            {position: "absolute", top: "25%", left: "33%", height: "500px"}}
                         >
                             <span className={"uk-text-small uk-weight-small"}>
                                 Download a project and click on an experiment to start exploring

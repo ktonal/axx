@@ -15,6 +15,7 @@ type ProjectProps = {
 type ProjectState = {
     active: boolean;
     onDisk: boolean;
+    isLoading: boolean;
 }
 
 
@@ -24,16 +25,24 @@ class ProjectCard extends React.Component<ProjectProps, ProjectState> {
         super(props);
         this.state = {
             active: false,
-            onDisk: this.props.onDisk
+            onDisk: this.props.onDisk,
+            isLoading: false,
         }
         this.downloadProject = this.downloadProject.bind(this);
     }
 
     downloadProject() {
+        let downloaded: number = 0;
+        this.setState({isLoading: true, onDisk: false});
         this.props.experiments.forEach(exp => {
-            axios.get("http://localhost:5000/experiment-data/" + this.props.name + "/" + exp)
+            axios.get("http://localhost:5000/experiment-data/" + this.props.name + "/" + exp).then(response => {
+                    downloaded = downloaded + 1;
+                    if (downloaded === this.props.experiments.length) {
+                        this.setState({onDisk: true, isLoading: false});
+                    }
+                }
+            )
         })
-        this.setState({onDisk: true});
     }
 
     render() {
@@ -52,14 +61,17 @@ class ProjectCard extends React.Component<ProjectProps, ProjectState> {
                     <span
                         onClick={() => this.setState({active: !this.state.active})}>
                         {this.props.name.split("/")[1]}
-                        {this.props.onDisk ?
-                            <span className={"uk-icon project-status"}
-                                  data-uk-icon={"check"}/>
-                            :
-                            <span className={"uk-icon project-status"}
+                        <span className={"uk-icon project-status"}
                                   onClick={this.downloadProject}
                                   data-uk-icon={"download"}/>
-                        }
+                        {this.state.isLoading ?
+                            <div data-uk-spinner={"ratio: .5"} className={"project-status"}/>
+                            : null}
+                        {this.state.onDisk ?
+                            <span className={"uk-icon project-status"}
+                                  data-uk-icon={"check"}/>
+                            : null}
+
                     </span>
                         <ul className={"uk-nav-sub"}>
                             {this.state.active && experiments}

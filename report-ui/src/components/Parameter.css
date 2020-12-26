@@ -1,6 +1,7 @@
 .parameter-section {
     float: left;
     font-size: small;
+    background-color: inherit;
 }
 
 .parameter {

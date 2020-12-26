@@ -6,7 +6,7 @@ export default class ExperimentHeader extends React.Component {
             return <span className={"uk-badge"} key={tagElement}>{tagElement}</span>
         })
         return (
-            <div className={"uk-card uk-card-default uk-card-body"}>
+            <div className={"experiment-header uk-card uk-card-default uk-card-body"}>
                 <h1>{this.props.id}</h1>
                 <div>
                     {tags}

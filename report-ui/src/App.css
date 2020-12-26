@@ -1,13 +1,31 @@
 .App {
-  display: table;
+  /*display: table;*/
   font-family: sans-serif;
+  background-color: #fffff7;
+}
+
+.nav-main {
+  background-color: inherit;
+  height: 80px;
+  margin-top: 25px;
+
+}
+
+#logo {
+  color: darkgrey;
+  text-align: center;
 }
 
 .sidebar {
   float: left;
   height: max-content;
-  width: 22%;
+  width: 25%;
   overflow-y: scroll;
+  background-color: inherit;
+}
+
+.experiment-header {
+  background-color: inherit;
 }
 
 .project-status {
@@ -23,5 +41,6 @@
 .experiment {
   width: 100%;
   display: table;
+  background-color: inherit;
 }
 
