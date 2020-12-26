@@ -1,139 +1,78 @@
-import React, {ReactNode, useState} from 'react';
+import React from "react";
 import axios from 'axios';
 
-import './style.css';
+import Waveform from "./Waveform";
+import ParameterSection from "./Parameter";
+import ExperimentHeader from "./ExperimentHeader";
 
-type ParamValue = string | number;
-
-type HParamRow = {
-    name: string;
-    value: ParamValue;
-};
-
-type ParamDict = { [key: string]: ParamValue };
-
-interface ExperimentProps {
-    experimentId: string,
+type ExperimentIdentifier = {
+    projectName: string;
+    id: string;
 }
 
-
-interface ExperimentState {
+type ExperimentState = {
+    projectName: string;
+    id: string;
     audios: Array<string>;
-    hparams: ParamDict;
-    properties: ParamDict;
+    hparams: Array<{ name: string, value: string }>;
+    properties: Array<{ name: string, value: string }>;
 }
 
-
-const ExperimentHeader: React.FC<{ experimentId: ParamValue }> = ({experimentId}) => {
-    return (
-        <h4 className={"uk-heading-small"}>
-            {experimentId}
-        </h4>
-    )
-};
-
-const ParameterRow: React.FC<HParamRow> = ({name, value}) => {
-    return (
-        <tr>
-            <td className={"uk-width-1-5"}>{name}</td>
-            <td className={"uk-width-4-5 uk-text-truncate"}>{value}</td>
-        </tr>
-    )
-};
-
-const ParameterTable: React.FC<{ tableName: string, params: ParamDict }> = ({tableName, params}) => {
-
-    const [displayed, setDisplay] = useState(false);
-
-    const body = [];
-    for (let key in params) {
-        body.push(<ParameterRow key={key} name={key}
-                                value={typeof params[key] === "string" ? params[key] : params[key].toString()}/>)
+export default class Experiment extends React.Component<ExperimentIdentifier, ExperimentState> {
+    constructor(props: ExperimentIdentifier) {
+        super(props);
+        this.state = {
+            projectName: this.props.projectName,
+            id: this.props.id,
+            audios: [],
+            hparams: [],
+            properties: [],
+        }
     }
-    return (
-        <div>
-            <li className={(displayed ? "uk-open " : "")}>
-                <a className={"uk-accordion-title experiment-header"}
-                   aria-expanded={displayed}
-                   onClick={() => setDisplay(!displayed)}>
-                    {tableName}
-                </a>
-                {displayed &&
-                <div className={"uk-accordion-content"}>
-                    <table className="uk-table uk-table-small uk-table-divider uk-text-nowrap parameter-table ">
-                        <tbody >{body}</tbody>
-                    </table>
-                </div>}
-            </li>
-        </div>
-    )
-};
 
-
-type AudioFiles = Array<string>;
-
-
-class WaveForm extends React.Component<{ file: string, experimentId: string }> {
-
-    render() {
-        const file = this.props.file;
-        const experimentId = this.props.experimentId;
-        return (
-            <div key={file}>
-                <legend>{file}</legend>
-                <audio className={"audio-player"}
-                       controls
-                       src={"http://localhost:5000/audio/" + experimentId + "/" + file}/>
-            </div>
-        )
-    }
-}
-
-const AudioGrid: React.FC<{ experimentId: ParamValue, files: AudioFiles }> = ({experimentId, files}) => {
-    const audios: Array<JSX.Element> = [];
-    files.map(file => {
-        audios.push(
-            <WaveForm file={file}
-                      experimentId={typeof experimentId === "string" ? experimentId : experimentId.toString()}/>
-        )
-    });
-    return (
-        <div className={"audio-grid"}>
-            {audios}
-        </div>
-    )
-};
-
-class Experiment extends React.Component<ExperimentProps, ExperimentState> {
-
-    state: ExperimentState = {
-        audios: [],
-        hparams: {},
-        properties: {},
-    };
-
-    componentDidMount() {
-        axios.get("http://localhost:5000/summary/MOD-32").then(response => {
-            this.setState({...response.data})
-        });
+    componentDidUpdate() {
+        if ((this.props.projectName && this.props.id) && (this.state.id !== this.props.id)) {
+            axios.get("http://localhost:5000/summary/" + this.props.projectName + "/" + this.props.id).then(
+                response => this.setState({
+                    projectName: this.props.projectName,
+                    id: this.props.id,
+                    audios: response.data.audios,
+                    hparams: response.data.hparams,
+                    properties: response.data.properties
+                })
+            )
+        }
     }
 
     render() {
+        const outputs: Array<React.ReactNode> = [];
+        this.state.audios.forEach(audio => outputs.push(
+            <React.Fragment key={audio}>
+                <Waveform title={audio}
+                          url={"http://localhost:5000/audio/"
+                          + this.state.projectName
+                          + "/" + this.state.id
+                          + "/" + audio}/>
+                <hr></hr>
+            </React.Fragment>
+        ))
+        console.log("PROPS", this.state.properties.length)
         return (
             <div>
-                <ExperimentHeader experimentId={this.state.properties.id}/>
-                <div className={""}>
-                    <h4 className={"uk-h4"}>Outputs</h4>
-
-                    <AudioGrid experimentId={this.state.properties.id} files={this.state.audios}/>
-                    <ul className={"uk-accordion parameter-table"}>
-                        <ParameterTable tableName={"Properties"} params={this.state.properties}/>
-                        <ParameterTable tableName={"Hparams"} params={this.state.hparams}/>
-                    </ul>
-                </div>
+                {Object.keys(this.state.properties).length > 0 ?
+                    <ExperimentHeader {...this.state.properties}/>
+                    : null}
+                <React.Fragment>
+                    <ParameterSection title={"Hyper Parameters"}
+                                      parameters={this.state.hparams}/>
+                    <div className={"uk-card uk-card-default uk-card-body outputs"}>
+                        <h3 className={"uk-card-title"}>Outputs</h3>
+                        {outputs}
+                    </div>
+                </React.Fragment>
             </div>
+
         )
+            ;
     }
 }
-
-export default Experiment;
