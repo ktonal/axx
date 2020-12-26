@@ -1,42 +1,27 @@
 .App {
-  /*text-align: center;*/
   display: table;
-  /*flex-wrap: nowrap;*/
+  font-family: sans-serif;
 }
 
 .sidebar {
-  display: table-cell;
+  float: left;
   height: max-content;
   width: 22%;
-  position: static;
-  top: 50px;
-  left: 50px;
   overflow-y: scroll;
-
-}
-
-.experiment {
-  width: 100%;
-  /*margin-left: auto;*/
-  /*float: left;*/
-  display: table;
-}
-
-
-.project-title:hover {
-  cursor: pointer;
 }
 
 .project-status {
-  /*width: 40px;*/
-  /*height: 40px;*/
   position: relative;
   left: 2px;
   bottom: 3px;
-  /*position: absolute;*/
-  /*bottom: 10px;*/
 }
 
 .project-status:hover {
   cursor: pointer;
 }
+
+.experiment {
+  width: 100%;
+  display: table;
+}
+

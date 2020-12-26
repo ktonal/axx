@@ -21,17 +21,31 @@ export default class App extends React.Component<{ }, {projectName: string, id: 
         const name = this.state.projectName;
         const id = this.state.id;
         return (
-            <div className="uk-container uk-container-large uk-width-expand App">
-                <Projects onChange={this.onExperimentClick}/>
-                <Experiment projectName={name} id={id}/>
+            <div className={"uk-nav uk-nav-default"}>
+                <h3 className={"uk-nav-header "}
+                    style={{textAlign: "right"}}>
+                    {"|{ A X X }|"}
+                </h3>
+                <div className="uk-container uk-container-large uk-width-expand App">
+                    <Projects onChange={this.onExperimentClick}/>
+                    {this.state.projectName ?
+                        <Experiment projectName={name} id={id}/>
+                        : <div className={"uk-text-center"} style={
+                            {position: "absolute", top: "30%", left: "40%", height: "500px"}}
+                        >
+                            <span className={"uk-text-small uk-weight-small"}>
+                                Download a project and click on an experiment to start exploring
+                            </span>
+                        </div>
+                    }
+                </div>
             </div>
         );
     }
 }
-/* - useContext in experiment update
-* - experiment header : ID, tags (= example's labels),( description,) losses, properties
+/* - experiment header : ID, link to neptune, tags (= example's labels),( description,) losses, properties
 * - hparams tree (data, model, optim)
-* - clean up css!
-* - nav : margins
-* - jsx -> tsx
+* - list of available checkpoints
+* - POST : tag, description, note / comment,
+* - DELETE : audio, checkpoints
 * - */

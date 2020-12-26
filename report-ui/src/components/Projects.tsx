@@ -40,10 +40,9 @@ class ProjectCard extends React.Component<ProjectProps, ProjectState> {
         const experiments = this.props.experiments.map((exp) => {
             return (
                 <li key={exp}>
-                    <a href={"#"}
-                       onClick={() => this.props.onChange(this.props.name, exp)}>
+                    <span onClick={() => this.props.onChange(this.props.name, exp)}>
                         {exp}
-                    </a>
+                    </span>
                 </li>)
         })
         return (
@@ -85,8 +84,7 @@ export default class Projects extends React.Component<{ onChange: Function }, Pr
     componentDidMount() {
         axios.get("http://localhost:5000/projects").then(response =>
             this.setState({
-                projects: [...response.data
-                ]
+                projects: [...response.data]
             })
         )
     }
@@ -100,9 +98,14 @@ export default class Projects extends React.Component<{ onChange: Function }, Pr
                                        experiments={project.experiments}
                                        onChange={this.props.onChange}/>))
         return (
-            <nav className={"uk-card uk-card-default uk-card-body sidebar"}>
-                {projects}
-            </nav>
+            <React.Fragment>
+                <nav className={"uk-card uk-card-default uk-card-body sidebar"}>
+                    <h3 className={"uk-card-title"}>
+                        Projects
+                    </h3>
+                    {projects}
+                </nav>
+            </React.Fragment>
         )
     }
 

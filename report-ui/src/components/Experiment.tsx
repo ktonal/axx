@@ -1,4 +1,4 @@
-import React from "react";
+import React  from "react";
 import axios from 'axios';
 
 import Waveform from "./Waveform";
@@ -73,6 +73,5 @@ export default class Experiment extends React.Component<ExperimentIdentifier, Ex
             </div>
 
         )
-            ;
-    }
-}
+    };
+};

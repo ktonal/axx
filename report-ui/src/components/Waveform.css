@@ -9,7 +9,6 @@ hr {
 }
 
 .play-button {
-    /*background: white;*/
     color: #2682b4;
     padding: 0 0;
     vertical-align: baseline;
@@ -18,8 +17,6 @@ hr {
 }
 
 .waveform-title {
-    /*font-size: x-small;*/
-    /*margin: 0;*/
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -28,6 +25,4 @@ hr {
 
 div.no-uk * {
     all: initial;
-    /*width: inherit;*/
-    /*padding: inherit;*/
 }

@@ -1,37 +1,20 @@
-.parameters {
-    display: table-cell;
-}
-
 .parameter-section {
-    /*display: table-cell;*/
     float: left;
     font-size: small;
-    /*width: 60%;*/
-    /*max-width: 50%;*/
-    /*height: max-content;*/
-    /*margin-left: 5px;*/
-    /*margin-bottom: 10px;*/
 }
 
 .parameter {
     display: table-row;
-    border-bottom: 1px solid gray;
-    /*padding: 4px 0;*/
-    /*display: inline-flex;*/
-    /*width: 120%;*/
-    /*align-items: self-start;*/
+    /*border-bottom: 1px solid gray; has no effect with display: table-row...*/
 }
 
 .param-name {
     display: table-cell;
     font-weight: bold;
-    /*width: 20%;*/
-    /*padding: 0 5px;*/
 }
 
 .param-value {
     display: table-cell;
-    /*width: 100%;*/
     max-width: 200px;
     text-overflow: ellipsis;
     overflow: hidden;
