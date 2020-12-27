@@ -1,4 +1,9 @@
 #!/bin/bash
 
 export FLASK_APP=./neptune_server/app.py
-flask run & npm start --prefix report-ui/
+flask run &
+pid[0]=$!
+npm start --prefix report-ui/ &
+pid[1]=$!
+trap "kill ${pid[0]} ${pid[1]}; exit 1" INT
+wait

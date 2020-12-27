@@ -24,7 +24,7 @@ export default class App extends React.Component<{ }, {projectName: string, id: 
             <div className={"App"}>
                 <div className={"nav-main uk-nav uk-nav-default"}>
                     <h3 id={"logo"}>
-                        {"< a u d i o - e x p e r i m e n t - e x p l o r e r >"}
+                        {"< a u d i o - e X p e r i m e n t - e X p l o r e r >"}
                     </h3>
                 </div>
                 <div className="uk-container uk-container-large uk-width-expand">
@@ -32,7 +32,7 @@ export default class App extends React.Component<{ }, {projectName: string, id: 
                     {this.state.projectName ?
                         <Experiment projectName={name} id={id}/>
                         : <div className={"uk-text-center"} style={
-                            {position: "absolute", top: "25%", left: "33%", height: "500px"}}
+                            {position: "absolute", top: "33%", left: "33%", height: "500px"}}
                         >
                             <span className={"uk-text-small uk-weight-small"}>
                                 Download a project and click on an experiment to start exploring
