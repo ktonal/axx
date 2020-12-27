@@ -4,7 +4,7 @@ import json
 import pandas as pd
 from zipfile import ZipFile
 import shutil
-from flask import Blueprint, send_from_directory
+from flask import Blueprint, send_from_directory, request
 
 
 sources = Blueprint("sources", __name__)
@@ -52,6 +52,7 @@ def get_experiment_data(namespace, project_name, exp_id):
     response = dict(audios=[], hparams={}, properties={})
     # get what we can from neptune
     response["properties"] = exp.get_system_properties()
+    response["properties"]["channels"] = {k: v.y for k, v in exp.get_logs().items()}
     response["hparams"] = format_parameters(exp.get_parameters())
 
     destination = os.path.join(PUBLIC_ROOT, project_name, exp_id)
@@ -110,3 +111,19 @@ def get_summary(project_name, experiment_id):
 @sources.route('/audio/<project_name>/<experiment_id>/<filename>/', methods=("GET",))
 def get_audio(project_name, experiment_id, filename):
     return send_from_directory(os.path.join(PUBLIC_ROOT, project_name, experiment_id, "audios"), filename)
+
+
+@sources.route("/edit/<namespace>/<project_name>/<experiment_id>/", methods=("PUT", ))
+def edit_experiment(namespace, project_name, experiment_id):
+    api_token = os.environ["NEPTUNE_API_TOKEN"]
+    session = neptune.Session.with_default_backend(api_token=api_token)
+    project = session.get_project(namespace + "/" + project_name)
+    exp = project.get_experiments(id=experiment_id)[0]
+
+    print(request)
+    tags = exp.get_tags()
+    new_tags = request["tags_append"]
+    delete_tags = request["tags_delete"]
+    new_description = request["description"]
+    new_note = request["note"]
+    delete_artifacts = request["artifacts_delete"]
