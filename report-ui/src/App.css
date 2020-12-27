@@ -13,6 +13,8 @@
 #logo {
   color: darkgrey;
   text-align: center;
+  position: relative;
+  top: 20%;
 }
 
 .sidebar {
@@ -36,7 +38,51 @@
 }
 
 .experiment-header {
+  font-size: small;
   background-color: inherit;
+  flex: 1;
+  line-height: 2;
+}
+
+.uk-badge {
+  margin: 0 2px;
+  background-color: #2682b4;
+}
+
+.channels {
+  /*font-size: medium;*/
+  /*display: flex;*/
+}
+
+.channel {
+  display: block;
+  color: indianred;
+}
+
+.channel-name {
+  display: inline-block;
+  margin: 0 10px 0 0;
+  min-width: 90px;
+  font-weight: bold;
+}
+
+.channel-value {
+  margin: 2px 10px 2px 0;
+  min-width: 200px;
+}
+
+.property {
+  display: -webkit-box;
+}
+
+.prop-name {
+  display: block;
+  width: 100px;
+  font-weight: bold;
+}
+
+.prop-value {
+
 }
 
 .project-status {

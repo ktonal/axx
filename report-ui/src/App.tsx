@@ -24,7 +24,7 @@ export default class App extends React.Component<{ }, {projectName: string, id: 
             <div className={"App"}>
                 <div className={"nav-main uk-nav uk-nav-default"}>
                     <h3 id={"logo"}>
-                        {"|{ A X X }|"}
+                        {"< a u d i o - e x p e r i m e n t - e x p l o r e r >"}
                     </h3>
                 </div>
                 <div className="uk-container uk-container-large uk-width-expand">
