@@ -118,7 +118,7 @@ export default class Projects extends React.Component<{ onChange: Function }, Pr
                                        onChange={this.props.onChange}/>))
         return (
             <React.Fragment>
-                <nav className={"uk-card uk-card-default uk-card-body sidebar"}>
+                <nav className={"sidebar uk-card uk-card-default uk-card-body"}>
                     <h3 className={"uk-card-title"}>
                         Projects
                     </h3>

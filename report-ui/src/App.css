@@ -1,7 +1,7 @@
 .App {
   /*display: table;*/
   font-family: sans-serif;
-  background-color: #fffff7;
+  background-color: #ffffff;
 }
 
 .nav-main {
@@ -19,6 +19,7 @@
 
 .sidebar {
   float: left;
+  font-size: small;
   height: max-content;
   width: max-content;
   overflow-y: scroll;
@@ -40,7 +41,7 @@
 .experiment-header {
   font-size: small;
   background-color: inherit;
-  flex: 1;
+  /*flex: 1;*/
   line-height: 2;
 }
 

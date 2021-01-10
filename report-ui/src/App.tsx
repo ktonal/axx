@@ -4,7 +4,7 @@ import "./App.css";
 import Projects from "./components/Projects";
 import Experiment from "./components/Experiment";
 
-export default class App extends React.Component<{ }, {projectName: string, id: string}>{
+export default class App extends React.Component<{}, { projectName: string, id: string }> {
     constructor(props: any) {
         super(props);
         this.state = {
@@ -13,7 +13,8 @@ export default class App extends React.Component<{ }, {projectName: string, id: 
         }
         this.onExperimentClick = this.onExperimentClick.bind(this);
     }
-    onExperimentClick(proj: string, id: string){
+
+    onExperimentClick(proj: string, id: string) {
         this.setState({projectName: proj.split("/")[1], id: id})
     }
 

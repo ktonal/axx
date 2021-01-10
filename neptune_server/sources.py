@@ -67,7 +67,7 @@ def get_experiment_data(namespace, project_name, exp_id):
             os.mkdir(destination)
 
     # we should have only one root folder in exp_root with sub-folders audios/, logs/ & states/
-    for folder in ["audios", "logs", "states"]:
+    for folder in ["audios", "logs"]:
         # download
         try:
             exp.download_artifacts(folder + "/", destination)
@@ -80,9 +80,7 @@ def get_experiment_data(namespace, project_name, exp_id):
         # clean up
         os.remove(os.path.join(destination, folder + ".zip"))
         # load response
-        if folder == "states":
-            shutil.rmtree(os.path.join(destination, "states"))
-        elif folder == "audios":
+        if folder == "audios":
             response["audios"] = os.listdir(os.path.join(destination, folder))
         elif folder == "logs":
             # cache the path to serve tensorboard later
