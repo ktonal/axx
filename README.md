@@ -1,6 +1,6 @@
 # Audio eXperiment eXplorer
 
-Minimalistic SPA made with `flask` and `React` to explore the outputs of audio generative models (made with [`mmk`](https://github.com/k-tonal/mmk))
+Minimalistic SPA made with `flask` and `React` to explore the outputs of audio generative models.
 
 ## Installation
 
