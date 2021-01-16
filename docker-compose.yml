@@ -34,7 +34,7 @@ services:
         build: 
             context: ./backend
             dockerfile: Dockerfile
-        command: gunicorn --bind 0.0.0.0:5000 app.app:app
+        command: gunicorn -w 4 --bind 0.0.0.0:5000 app.app:create_app()
         ports:
             - "5000:5000"
         environment:
@@ -43,7 +43,7 @@ services:
             MONGODB_PASSWORD: "apipassword"
             NEPTUNE_API_TOKEN:
         volumes:
-            - appdata:/var/www/
+            - './app/:/home/app'
         depends_on: 
             - mongodb
         networks:
@@ -57,6 +57,4 @@ networks:
         driver: bridge
 volumes:
     mongodbdata:
-        driver: local
-    appdata:
         driver: local
