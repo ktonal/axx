@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
 
-from neptune_server.sources import sources
+from .sources import sources
 
 app = Flask(__name__)
 CORS(app)
