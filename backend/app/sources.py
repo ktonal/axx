@@ -6,6 +6,7 @@ from zipfile import ZipFile
 import shutil
 from flask import Blueprint, send_from_directory, request
 
+from .models import Database
 
 sources = Blueprint("sources", __name__)
 
@@ -25,6 +26,7 @@ def format_parameters(param_dict):
 
 @sources.route('/projects', methods=("GET",))
 def get_projects():
+    print(Database().db)
     api_token = os.environ["NEPTUNE_API_TOKEN"]
     session = neptune.Session.with_default_backend(api_token=api_token)
     projects = session.get_projects(USER)

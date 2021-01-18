@@ -19,14 +19,14 @@ services:
         image: mongo
         container_name: mongo
         restart: unless-stopped
-        command: mongod --auth
+        command: mongod --port 27017 --bind_ip 0.0.0.0
         environment:
             MONGO_INITDB_ROOT_USERNAME: "admin"
-            MONGO_INITDB_ROOT_PASSWORD: "password"
-            MONGO_INITDB_DATABASE: webapp
+            MONGO_INITDB_ROOT_PASSWORD: "admin_password"
+            MONGO_INITDB_DATABASE: "axx"
             MONGODB_DATA_DIR: /data/db
         volumes:
-        - mongodbdata:/data/db
+        - axx-db:/data/db
         networks:
         - backend
 
@@ -34,16 +34,19 @@ services:
         build: 
             context: ./backend
             dockerfile: Dockerfile
-        command: gunicorn -w 4 --bind 0.0.0.0:5000 app.app:create_app()
+        command: gunicorn -w 1 --bind 0.0.0.0:5000 --timeout 120 app.main:app
         ports:
             - "5000:5000"
         environment:
-            MONGODB_HOST: mongodb
-            MONGODB_USERNAME: "apiuser"
-            MONGODB_PASSWORD: "apipassword"
+            MONGODB_HOST: "mongo"
+            MONGODB_USERNAME: "user"
+            MONGODB_PASSWORD: "password"
+            MONGO_INITDB_DATABASE: "axx"
+            MONGO_INITDB_ROOT_USERNAME: "admin"
+            MONGO_INITDB_ROOT_PASSWORD: "admin_password"
             NEPTUNE_API_TOKEN:
         volumes:
-            - './app/:/home/app'
+            - files:/files
         depends_on: 
             - mongodb
         networks:
@@ -56,5 +59,7 @@ networks:
     backend:
         driver: bridge
 volumes:
-    mongodbdata:
+    axx-db:
+        driver: local
+    files:
         driver: local
