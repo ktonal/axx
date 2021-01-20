@@ -34,7 +34,7 @@ services:
         build: 
             context: ./backend
             dockerfile: Dockerfile
-        command: gunicorn -w 1 --bind 0.0.0.0:5000 --timeout 120 app.main:app
+        command: gunicorn -w 1 --bind 0.0.0.0:5000 --timeout 520 app.main:app
         ports:
             - "5000:5000"
         environment:

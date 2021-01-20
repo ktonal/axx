@@ -3,25 +3,41 @@ hr {
     border-color: lightgray;
 }
 
+.audio-element {
+    width: 400px;
+    height: 100px;
+    float: left;
+    margin: 0 3px;
+    border: 1px solid gray;
+    padding: 3px;
+    border-radius: 15px;
+}
+
+.waveform {
+}
+
 .outputs {
     max-height: 560px;
     overflow: scroll;
     background-color: inherit;
 }
 
+.waveform-header {
+    display: flex;
+    align-items: center;
+}
+
 .play-button {
-    color: #2682b4;
-    padding: 0 0;
-    vertical-align: baseline;
-    position: relative;
-    top: -2px;
+    font-size: xx-large;
+    color: gray;
 }
 
 .waveform-title {
+    font-size: small;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    margin-bottom: 0;
+    padding-left: 5px;
 }
 
 div.no-uk * {

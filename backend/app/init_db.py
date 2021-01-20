@@ -25,7 +25,10 @@ def download_audios(index, project_name, exp_id):
     project = session.get_project("k-tonal/" + project_name)
     exp = project.get_experiments(id=exp_id)[0]
     destination = os.path.join("files", project_name, exp_id)
-    exp.download_artifacts("audios", destination)
+    try:
+        exp.download_artifacts("audios", destination)
+    except neptune.exceptions.FileNotFound:
+        return (index, {})
     archive = os.path.join(destination, "audios.zip")
     with ZipFile(archive) as f:
         f.extractall(destination)
@@ -64,7 +67,7 @@ def init_k_tonal(db):
 
         exps = df.to_dict(orient="index")
 
-        exps = dict([(i, d) for i, d in exps.items() if i < 10])
+        # exps = dict([(i, d) for i, d in exps.items() if i < 10])
 
         with Pool(cpu_count()) as p:
             updates = p.starmap(download_audios, [(i, project.name, exp["id"]) for i, exp in exps.items()])

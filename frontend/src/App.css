@@ -1,104 +1,89 @@
 .App {
-  /*display: table;*/
-  font-family: sans-serif;
-  background-color: #ffffff;
+    /*display: table;*/
+    /*font-family: sans-serif;*/
+    /*background-color: #ffffff;*/
+    /*overflow: auto;*/
+
 }
 
 .nav-main {
-  background-color: inherit;
-  height: 80px;
-  margin-top: 25px;
+    background-color: inherit;
+    height: 80px;
+    margin-top: 25px;
 }
 
 #logo {
-  color: darkgrey;
-  text-align: center;
-  position: relative;
-  top: 20%;
+    color: darkgrey;
+    text-align: center;
+    position: relative;
+    top: 20%;
 }
 
-.sidebar {
-  float: left;
-  font-size: small;
-  height: max-content;
-  width: max-content;
-  overflow-y: scroll;
-  background-color: inherit;
+.table-options {
+    /*margin: 100px 100px;*/
+    margin-bottom: 150px;
+    height: 20px;
 }
 
-.project-name {
-  /*max-width: 100px;*/
-  /*text-overflow: ellipsis;*/
-  /*overflow: hidden;*/
-  /*white-space: nowrap;*/
+.column-toggle {
+    display: grid;
+    float: left;
+    width: 200px;
 }
 
-.project-icons {
-  float: right;
-  padding: 0 5px;
+table {
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid black;
+    display: block;
+    overflow-x: scroll;
+    white-space: nowrap;
 }
 
-.experiment-header {
-  font-size: small;
-  background-color: inherit;
-  /*flex: 1;*/
-  line-height: 2;
+thead {
+    /*display: block;*/
+    /*overflow: revert;*/
 }
 
-.uk-badge {
-  margin: 0 2px;
-  background-color: #2682b4;
+table th {
+    position: sticky;
+    background: white;
+    top: 0;
+    z-index: 8;
+    min-width: 200px;
+    max-width: 300px;
+    height: 80px;
+    border: 1px solid black;
 }
 
-.channels {
-  /*font-size: medium;*/
-  /*display: flex;*/
+table td {
+    padding: 5px 0 10px 20px;
+    border: 1px solid black;
 }
 
-.channel {
-  display: block;
-  color: indianred;
+.column-title {
+    position: relative;
+    top: 30%;
+    left: 20px;
+    float: left;
+    /*text-align: center;*/
 }
 
-.channel-name {
-  display: inline-block;
-  margin: 0 10px 0 0;
-  min-width: 90px;
-  font-weight: bold;
+/*.grouped-column {*/
+/*    position: sticky;*/
+/*    left: 0;*/
+/*    z-index: 10;*/
+/*}*/
+
+.column-icons {
+    float: right;
+    position: relative;
+    top: 0;
+    right: 0;
+    display: grid;
+    margin: 0 0 0 auto;
 }
 
-.channel-value {
-  margin: 2px 10px 2px 0;
-  min-width: 200px;
+.column-icons i {
+    margin: 0 3px 3px 3px;
 }
-
-.property {
-  display: -webkit-box;
-}
-
-.prop-name {
-  display: block;
-  width: 100px;
-  font-weight: bold;
-}
-
-.prop-value {
-
-}
-
-.project-status {
-  position: relative;
-  left: 2px;
-  bottom: 3px;
-}
-
-.project-status:hover {
-  cursor: pointer;
-}
-
-.experiment {
-  width: 100%;
-  display: table;
-  background-color: inherit;
-}
-

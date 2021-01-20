@@ -10,10 +10,10 @@ const waveSurferOptions = ref => ({
     progressColor: "#2682b4",
     cursorColor: "#2682b4",
     barWidth: 1,
-    barHeight: 3,
-    maxCanvasWidth: 2000,
+    barHeight: 4,
+    maxCanvasWidth: 200,
     responsive: true,
-    height: 38,
+    height: 50,
     // Use the PeakCache to improve rendering speed of large waveforms.
     partialRender: false
 });
@@ -53,13 +53,12 @@ export default function Waveform({url, title}) {
         <div className={"audio-element"}>
             {/* the header */}
             <div className={"waveform-header"}>
-                <p className={"waveform-title"}>
-                    <button className={"uk-button play-button"}
-                            data-uk-icon={"play-circle"}
-                            onClick={handlePlayPause}>
-                     </button>
-                    {"  " + title}
-                </p>
+                <i className={"play-button fa " + (playing ? "fa-pause-circle" : "fa-play-circle-o")}
+                   onClick={handlePlayPause}>
+                </i>
+                <span className={"waveform-title"}>
+                {"  " + title}
+                </span>
             </div>
             {/* the waveform (ui kit must be turned off for it to display correctly) */}
             <div className={"no-uk waveform"}

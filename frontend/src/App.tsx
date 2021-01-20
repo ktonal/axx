@@ -1,8 +1,7 @@
 import React from "react";
 import "./App.css";
 
-import Projects from "./components/Projects";
-import Experiment from "./components/Experiment";
+import ExperimentsTable from "./components/ExperimentsTable";
 
 export default class App extends React.Component<{}, { projectName: string, id: string }> {
     constructor(props: any) {
@@ -23,23 +22,13 @@ export default class App extends React.Component<{}, { projectName: string, id: 
         const id = this.state.id;
         return (
             <div className={"App"}>
-                <div className={"nav-main uk-nav uk-nav-default"}>
+                <div>
                     <h3 id={"logo"}>
                         {"< a u d i o - e X p e r i m e n t - e X p l o r e r >"}
                     </h3>
                 </div>
-                <div className="uk-container uk-container-large uk-width-expand">
-                    <Projects onChange={this.onExperimentClick}/>
-                    {this.state.projectName ?
-                        <Experiment projectName={name} id={id}/>
-                        : <div className={"uk-text-center"} style={
-                            {position: "absolute", top: "33%", left: "33%", height: "500px"}}
-                        >
-                            <span className={"uk-text-small uk-weight-small"}>
-                                Download a project and click on an experiment to start exploring
-                            </span>
-                        </div>
-                    }
+                <div>
+                    <ExperimentsTable />
                 </div>
             </div>
         );
