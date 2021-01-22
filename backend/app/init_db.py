@@ -50,7 +50,7 @@ def init_k_tonal(db):
 
     Exps = db.Experiments
     # RESET everything!
-    print("----> Dropping pre-existing Experiments Table")
+    # print("----> Dropping pre-existing Experiments Table")
     Exps.drop()
 
     for name, project in projects.items():
@@ -65,6 +65,11 @@ def init_k_tonal(db):
         df["running_time"] = pd.to_datetime(df.running_time, unit='s').dt.strftime("%Hh-%Mm-%Ss")
         df["created"] = df.created.dt.strftime('%B %d, %Y')
 
+        prior = list(Exps.find({"project": {"$in": ["experiment-1", "experiment-2"]}}))
+        for e in prior:
+            if any(df["id"].str.contains(e["id"])):
+                df = df[df["id"] != e["id"]]
+        print(len(df), "experiments to add")
         exps = df.to_dict(orient="index")
 
         # exps = dict([(i, d) for i, d in exps.items() if i < 10])

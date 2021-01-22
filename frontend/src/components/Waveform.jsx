@@ -38,6 +38,7 @@ export default function Waveform({url, title, handleFinish}) {
                 wavesurfer.current.setVolume(0.5);
             }
         wavesurfer.current.on("seek", () => {
+            setPlay(true);
             wavesurfer.current.play()
         });
         wavesurfer.current.on("finish", () => {
@@ -57,7 +58,7 @@ export default function Waveform({url, title, handleFinish}) {
 
     return (
         // the container
-        <div className={"audio-element"}>
+        <div className={"waveform-element"}>
             {/* the header */}
             <div className={"waveform-header"}>
                 <i className={"play-button fa " + (playing ? "fa-pause-circle" : "fa-play-circle-o")}
@@ -69,7 +70,7 @@ export default function Waveform({url, title, handleFinish}) {
                 </span>
             </div>
             {/* the waveform (ui kit must be turned off for it to display correctly) */}
-            <div className={"no-uk waveform"}
+            <div className={"waveform"}
                  ref={waveformRef}>
             </div>
         </div>

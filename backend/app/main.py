@@ -22,7 +22,7 @@ app.config["MONGO_URI"] = "mongodb://" + \
                           os.environ["MONGO_INITDB_DATABASE"]
 app.db = PyMongo(app).db
 
-# init_k_tonal(app.db)
+init_k_tonal(app.db)
 
 # app.register_blueprint(sources)
 app.register_blueprint(exp_bp)

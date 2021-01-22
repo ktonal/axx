@@ -14,16 +14,33 @@ import {DragDropContext, Droppable, Draggable} from "react-beautiful-dnd";
 import Waveform from "./Waveform";
 
 
-function ColumnManager({ getToggleHideAllColumnsProps, allColumns, setColumnOrder }) {
-    const [state, setState] = useState({ cols: allColumns});
+function ColumnManager({getToggleHideAllColumnsProps, allColumns, setColumnOrder}) {
+    const [stateCols, setState] = useState([]);
 
     const reorder = (list, startIndex, endIndex) => {
         const result = Array.from(list);
+        if (result[startIndex].isGrouped) { return result }
         const [removed] = result.splice(startIndex, 1);
         result.splice(endIndex, 0, removed);
         return result;
     };
 
+    useEffect(() => {
+        if (stateCols.length === 0) {
+            console.log("SETTING ALL:", allColumns.map(c => c.id));
+            setState([
+                ...allColumns.filter(c => c.isGrouped),
+                ...allColumns.filter(c => c.isVisible && !c.isGrouped),
+                ...allColumns.filter(c => !c.isVisible)]
+            )
+        }
+    }, [stateCols.length, allColumns]);
+
+    useEffect(() => {
+        if (stateCols.length > 0) {
+            setColumnOrder(stateCols.map(c => c.id))
+        }
+    }, [stateCols, setColumnOrder]);
 
     function onDragEnd(result) {
         if (!result.destination) {
@@ -33,20 +50,20 @@ function ColumnManager({ getToggleHideAllColumnsProps, allColumns, setColumnOrde
         if (result.destination.index === result.source.index) {
             return;
         }
-        // console.log(state.cols.map(c => c.id));
         const columns = reorder(
-            state.cols,
+            stateCols,
             result.source.index,
-            result.destination.index + 1
+            result.destination.index
         );
-        setState({ cols: columns });
-        setColumnOrder(columns.map(c => c.id));
+        console.log("REORDERED:", columns.map(c => c.id));
+        setState([
+                ...columns.filter(c => c.isGrouped),
+                ...columns.filter(c => c.isVisible && !c.isGrouped),
+                ...columns.filter(c => !c.isVisible)]);
     }
 
     return (
-
-        <div className={"table-options"}>
-
+        <div className={"column-manager"}>
             <div className={"column-toggle"}>
                 <label>
                     <input type="checkbox" {...getToggleHideAllColumnsProps()} />{' '}
@@ -57,12 +74,12 @@ function ColumnManager({ getToggleHideAllColumnsProps, allColumns, setColumnOrde
                 <Droppable droppableId={"list"}>
                     {provided => (
                         <div ref={provided.innerRef} {...provided.droppableProps}>
-                            {allColumns.map((column, index) => (
+                            {stateCols.map((column, index) => (
 
                                 <Draggable key={column.id} index={index} draggableId={column.id}
-                                           className={"column-toggle"}>
+                                >
                                     {provided => (
-                                        <div>
+                                        <div className={"column-toggle"}>
                                             <label
                                                 ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
                                                 <input type="checkbox" {...column.getToggleHiddenProps()} />{' '}
@@ -82,18 +99,16 @@ function ColumnManager({ getToggleHideAllColumnsProps, allColumns, setColumnOrde
 
 // simple filter
 function GlobalFilter({
-                          preGlobalFilteredRows,
                           globalFilter,
                           setGlobalFilter,
                       }) {
-    const count = preGlobalFilteredRows.length;
     const [value, setValue] = React.useState(globalFilter);
     const onChange = useAsyncDebounce(value => {
         setGlobalFilter(value || undefined)
     }, 200);
 
     return (
-        <span>
+        <div className={"search-bar"}>
             <input
                 value={value || ""}
                 onChange={e => {
@@ -103,14 +118,17 @@ function GlobalFilter({
                 placeholder={`Search : ...`}
                 style={{
                     fontSize: '1.1rem',
-                    border: '0',
                 }}
             />
-        </span>
+        </div>
     )
 }
 
 const Table = ({columns, data, audios}) => {
+    const initialGroupBy = ["project", "DB"];
+    const initialHidden = columns.filter(
+        c => c.id.toUpperCase() !== c.id && !["Audios", "project", "accum_outputs", "pad_input", "with_skip_conv", "with_residual_conv"].includes(c.Header))
+        .map(c => c.id);
     const {
         getTableProps,
         getTableBodyProps,
@@ -127,7 +145,8 @@ const Table = ({columns, data, audios}) => {
     } = useTable({
             columns, data,
             initialState: {
-                groupBy: ["project", "DB"]
+                groupBy: initialGroupBy,
+                hiddenColumns: initialHidden
             }
         },
         useColumnOrder,
@@ -136,31 +155,22 @@ const Table = ({columns, data, audios}) => {
         useSortBy,
         useExpanded,
     );
-    // by default, we order columns by the number of distinct elements they have
-    // and cap their numbers to 12
-    // const sortedColumns = {};
-    // find distinct elements
-    // allColumns.forEach(column => {
-    //     let id = column.id;
-    //     let values = data.map(exp => exp[id]);
-    //     sortedColumns[id] = Array.from([...new Set(values)])
-    // });
     return (
         <>
-            <ColumnManager getToggleHideAllColumnsProps={getToggleHideAllColumnsProps}
-                           allColumns={allColumns}
-                           setColumnOrder={setColumnOrder}
-            />
-            <br/>
+            <div className={"control-panel"}>
             {/* Global Filter */}
             <GlobalFilter
-                preGlobalFilteredRows={preGlobalFilteredRows}
                 globalFilter={state.globalFilter}
                 setGlobalFilter={setGlobalFilter}
             />
+            <ColumnManager getToggleHideAllColumnsProps={getToggleHideAllColumnsProps}
+                allColumns={allColumns}
+                setColumnOrder={setColumnOrder}
+                />
             <br/>
-            {/*<pre>{JSON.stringify(state, null, 2)}</pre>*/}
-            <div>Displaying {rows.length} results</div>
+            <div style={{margin: "auto", width: "max-content"}}>Displaying {rows.length} results</div>
+            </div>
+            {/*<pre>{JSON.stringify(state.hiddenColumns, null, 2)}</pre>*/}
             {/* The Table */}
             <br/>
             <table {...getTableProps()}>
@@ -168,11 +178,14 @@ const Table = ({columns, data, audios}) => {
                 {headerGroups.map(headerGroup => (
                     <tr {...headerGroup.getHeaderGroupProps()}>
                         {headerGroup.headers.map(column => (
-                            <th {...column.getHeaderProps(column.getSortByToggleProps())}
-                                className={column.isGrouped ? "grouped-column" : ""}>
+                            <th {...column.getHeaderProps(column.getSortByToggleProps())}>
                                 {column.id === "expander" ?
                                     <span className={"column-title"}
-                                          style={{top: "-2px"}}>{column.render('Header')}</span>
+                                          style={{
+                                              top: "-1%",
+                                              left: "5%",
+                                              width: "100px"
+                                          }}>{column.render('Header')}</span>
                                     : <>
                                         <span className={"column-title"}>{column.render('Header')}</span>
                                         {/* Add a sort direction indicator */}
@@ -214,11 +227,11 @@ const Table = ({columns, data, audios}) => {
                                                 className={cell.isGrouped ? "grouped-column" : ""}
                                                 style={{
                                                     background: cell.isGrouped
-                                                        ? '#0aff0082'
+                                                        ? '#a6ff4474'
                                                         : cell.isAggregated
-                                                            ? '#ffa50078'
+                                                            ? '#ffa10045'
                                                             : cell.isPlaceholder
-                                                                ? '#ff000042'
+                                                                ? '#ff330042'
                                                                 : 'white',
                                                 }}
                                             >
@@ -246,18 +259,19 @@ const Table = ({columns, data, audios}) => {
                                 {/*then the audios if the row is expanded */}
                                 {(row.isExpanded && !row.cells.some(cell => cell.isGrouped)) &&
                                 <tr>
-                                    <td colSpan={rows.length} style={{"borderRight": "0"}}>
-                                        {audios[row.original.id].map((x, i) => {
+                                    <td colSpan={rows.length} className={"audio-container"}>
+                                        {audios[row.original.id] &&
+                                        audios[row.original.id].map((x, i) => {
                                             return <Waveform
                                                 key={x}
                                                 url={"http://localhost:5000/" + x}
                                                 title={x.split("/")[4]}
                                                 handleFinish={() => {
                                                     const list = audios[row.original.id];
-                                                    const index = list.indexOf(x)+1;
-                                                    if (index < list.length){
+                                                    const index = list.indexOf(x) + 1;
+                                                    if (index < list.length) {
                                                         const id = list[index].split("/")[4];
-                                                        const element = document.getElementById("play-"+id);
+                                                        const element = document.getElementById("play-" + id);
                                                         element.click()
                                                     }
                                                 }}
@@ -294,7 +308,7 @@ export default function ExperimentsTable() {
                 columns = Array.from([...columns]);
                 // format and prepend extra columns for the UI
                 columns = columns.map(name => {
-                    return {Header: name, accessor: name}
+                    return {Header: name, accessor: name, id: name}
                 });
                 // column for expanding/collapsing audios
                 columns.unshift({
@@ -307,7 +321,7 @@ export default function ExperimentsTable() {
                                 : <i className={"fa fa-chevron-right"}/>}
                             {(!row.cells.some(cell => cell.isGrouped) && row.original.hasOwnProperty("audios")) ?
                                 `(${row.original.audios.length.toString()})`
-                                : ""}
+                                : null}
                         </span>
                     )
                 });
@@ -320,7 +334,7 @@ export default function ExperimentsTable() {
     data.forEach(exp => audios[exp.id] = exp.audios);
     const memoColumns = useMemo(() => columns, [columns]);
     const memoData = useMemo(() => data, [data]);
-    // console.log(columns);
+    // console.log(memoColumns);
     return (
         <Table columns={memoColumns} data={memoData} audios={audios}/>
     )
