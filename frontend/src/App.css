@@ -3,7 +3,7 @@
     /*font-family: sans-serif;*/
     /*background-color: #ffffff;*/
     /*overflow: auto;*/
-
+    color: #2C2C2C;
 }
 
 .nav-main {
@@ -20,23 +20,24 @@
 }
 
 .table-options {
-    /*margin: 100px 100px;*/
-    margin-bottom: 150px;
-    height: 20px;
+    margin-bottom: 20px;
+    height: 500px;
+    width: max-content;
+    overflow-y: scroll;
+    border: 1px solid #8E8E8E;
 }
 
 .column-toggle {
     display: grid;
-    float: left;
+    /*float: left;*/
     width: 200px;
 }
 
 table {
     border-collapse: separate;
     border-spacing: 0;
-    border: 1px solid black;
-    display: block;
-    overflow-x: scroll;
+    border: 1px solid #8E8E8E;
+    color: black;
     white-space: nowrap;
 }
 
@@ -53,12 +54,12 @@ table th {
     min-width: 200px;
     max-width: 300px;
     height: 80px;
-    border: 1px solid black;
+    border: 1px solid #8E8E8E;
 }
 
 table td {
     padding: 5px 0 10px 20px;
-    border: 1px solid black;
+    border: 1px solid #8E8E8E;
 }
 
 .column-title {
@@ -66,14 +67,8 @@ table td {
     top: 30%;
     left: 20px;
     float: left;
-    /*text-align: center;*/
+    /*color: #6D6D6D;*/
 }
-
-/*.grouped-column {*/
-/*    position: sticky;*/
-/*    left: 0;*/
-/*    z-index: 10;*/
-/*}*/
 
 .column-icons {
     float: right;
@@ -86,4 +81,8 @@ table td {
 
 .column-icons i {
     margin: 0 3px 3px 3px;
+    color: #6D6D6D;
+}
+.fa {
+    color: #6D6D6D;
 }

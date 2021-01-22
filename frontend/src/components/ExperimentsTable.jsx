@@ -10,9 +10,77 @@ import ReactTable, {
     useGlobalFilter,
     useAsyncDebounce
 } from 'react-table';
+import {DragDropContext, Droppable, Draggable} from "react-beautiful-dnd";
 import Waveform from "./Waveform";
 
-// Define a default UI for filtering
+
+function ColumnManager({ getToggleHideAllColumnsProps, allColumns, setColumnOrder }) {
+    const [state, setState] = useState({ cols: allColumns});
+
+    const reorder = (list, startIndex, endIndex) => {
+        const result = Array.from(list);
+        const [removed] = result.splice(startIndex, 1);
+        result.splice(endIndex, 0, removed);
+        return result;
+    };
+
+
+    function onDragEnd(result) {
+        if (!result.destination) {
+            return;
+        }
+
+        if (result.destination.index === result.source.index) {
+            return;
+        }
+        // console.log(state.cols.map(c => c.id));
+        const columns = reorder(
+            state.cols,
+            result.source.index,
+            result.destination.index + 1
+        );
+        setState({ cols: columns });
+        setColumnOrder(columns.map(c => c.id));
+    }
+
+    return (
+
+        <div className={"table-options"}>
+
+            <div className={"column-toggle"}>
+                <label>
+                    <input type="checkbox" {...getToggleHideAllColumnsProps()} />{' '}
+                    {"All columns"}
+                </label>
+            </div>
+            <DragDropContext onDragEnd={onDragEnd}>
+                <Droppable droppableId={"list"}>
+                    {provided => (
+                        <div ref={provided.innerRef} {...provided.droppableProps}>
+                            {allColumns.map((column, index) => (
+
+                                <Draggable key={column.id} index={index} draggableId={column.id}
+                                           className={"column-toggle"}>
+                                    {provided => (
+                                        <div>
+                                            <label
+                                                ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                                <input type="checkbox" {...column.getToggleHiddenProps()} />{' '}
+                                                {column.Header}
+                                            </label>
+                                        </div>)}
+                                </Draggable>
+                            ))}
+                            {provided.placeholder}
+                        </div>
+                    )}
+                </Droppable>
+            </DragDropContext>
+        </div>
+    )
+}
+
+// simple filter
 function GlobalFilter({
                           preGlobalFilteredRows,
                           globalFilter,
@@ -51,17 +119,23 @@ const Table = ({columns, data, audios}) => {
         prepareRow,
         allColumns,
         getToggleHideAllColumnsProps,
+        setColumnOrder,
+        visibleColumns,
         state,
         preGlobalFilteredRows,
         setGlobalFilter
-    } = useTable({columns, data},
+    } = useTable({
+            columns, data,
+            initialState: {
+                groupBy: ["project", "DB"]
+            }
+        },
         useColumnOrder,
         useGlobalFilter,
         useGroupBy,
         useSortBy,
         useExpanded,
     );
-
     // by default, we order columns by the number of distinct elements they have
     // and cap their numbers to 12
     // const sortedColumns = {};
@@ -73,25 +147,10 @@ const Table = ({columns, data, audios}) => {
     // });
     return (
         <>
-
-            {/* Component for selecting columns */}
-            <div className={"table-options"}>
-                <div className={"column-toggle"}>
-                    <label>
-                        <input type="checkbox" {...getToggleHideAllColumnsProps()} />{' '}
-                        {"All columns"}
-                    </label>
-                </div>
-                {allColumns.map(column => (
-                    <div key={column.id} className={"column-toggle"}>
-                        <label>
-                            <input type="checkbox" {...column.getToggleHiddenProps()} />{' '}
-                            {column.Header}
-                        </label>
-                    </div>
-                ))}
-                {" "}
-            </div>
+            <ColumnManager getToggleHideAllColumnsProps={getToggleHideAllColumnsProps}
+                           allColumns={allColumns}
+                           setColumnOrder={setColumnOrder}
+            />
             <br/>
             {/* Global Filter */}
             <GlobalFilter
@@ -100,7 +159,7 @@ const Table = ({columns, data, audios}) => {
                 setGlobalFilter={setGlobalFilter}
             />
             <br/>
-            {/*<pre>{JSON.stringify(visibleColumns, null, 2)}</pre>*/}
+            {/*<pre>{JSON.stringify(state, null, 2)}</pre>*/}
             <div>Displaying {rows.length} results</div>
             {/* The Table */}
             <br/>
@@ -126,7 +185,7 @@ const Table = ({columns, data, audios}) => {
                                                 <i {...column.getGroupByToggleProps()}
                                                    className={"fa fa-indent"}
                                                    style={{
-                                                       color: column.isGrouped ? "green" : 'black',
+                                                       color: column.isGrouped ? "green" : '#6D6D6D',
                                                    }}/>
                                             ) : null}
                                         </span>
@@ -193,6 +252,15 @@ const Table = ({columns, data, audios}) => {
                                                 key={x}
                                                 url={"http://localhost:5000/" + x}
                                                 title={x.split("/")[4]}
+                                                handleFinish={() => {
+                                                    const list = audios[row.original.id];
+                                                    const index = list.indexOf(x)+1;
+                                                    if (index < list.length){
+                                                        const id = list[index].split("/")[4];
+                                                        const element = document.getElementById("play-"+id);
+                                                        element.click()
+                                                    }
+                                                }}
                                             />
                                         })}
                                     </td>
@@ -252,6 +320,7 @@ export default function ExperimentsTable() {
     data.forEach(exp => audios[exp.id] = exp.audios);
     const memoColumns = useMemo(() => columns, [columns]);
     const memoData = useMemo(() => data, [data]);
+    // console.log(columns);
     return (
         <Table columns={memoColumns} data={memoData} audios={audios}/>
     )

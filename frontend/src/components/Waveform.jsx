@@ -18,7 +18,7 @@ const waveSurferOptions = ref => ({
     partialRender: false
 });
 
-export default function Waveform({url, title}) {
+export default function Waveform({url, title, handleFinish}) {
     const waveformRef = useRef(null);
     const wavesurfer = useRef(null);
     const [playing, setPlay] = useState(false);
@@ -37,6 +37,13 @@ export default function Waveform({url, title}) {
             if (wavesurfer.current) {
                 wavesurfer.current.setVolume(0.5);
             }
+        wavesurfer.current.on("seek", () => {
+            wavesurfer.current.play()
+        });
+        wavesurfer.current.on("finish", () => {
+            handleFinish()
+            setPlay(false)
+        });
         });
         // Removes events, elements and disconnects Web Audio nodes.
         // when component unmount
@@ -54,6 +61,7 @@ export default function Waveform({url, title}) {
             {/* the header */}
             <div className={"waveform-header"}>
                 <i className={"play-button fa " + (playing ? "fa-pause-circle" : "fa-play-circle-o")}
+                   id={`play-${title}`}
                    onClick={handlePlayPause}>
                 </i>
                 <span className={"waveform-title"}>
