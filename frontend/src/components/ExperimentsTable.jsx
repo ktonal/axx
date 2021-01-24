@@ -76,8 +76,7 @@ function ColumnManager({getToggleHideAllColumnsProps, allColumns, setColumnOrder
                         <div ref={provided.innerRef} {...provided.droppableProps}>
                             {stateCols.map((column, index) => (
 
-                                <Draggable key={column.id} index={index} draggableId={column.id}
-                                >
+                                <Draggable key={column.id} index={index} draggableId={column.id}>
                                     {provided => (
                                         <div className={"column-toggle"}>
                                             <label
@@ -220,8 +219,7 @@ const Table = ({columns, data, audios}) => {
                                     {row.cells.map(cell => {
                                         return (
                                             <td
-                                                // For educational purposes, let's color the
-                                                // cell depending on what type it is given
+                                                // color the cell depending on what type it is given
                                                 // from the useGroupBy hook
                                                 {...cell.getCellProps()}
                                                 className={cell.isGrouped ? "grouped-column" : ""}
