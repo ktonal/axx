@@ -20,7 +20,7 @@ git clone https://github.com/k-tonal/axx.git
 
 ```bash
 cd axx
-docker-compose build .
+docker-compose build
 ```
 
 ## Run the App
