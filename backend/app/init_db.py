@@ -43,7 +43,7 @@ def download_audios(index, project_name, exp_id):
 
 def init_k_tonal(db):
     print("---- Initializing K-TONAL ----")
-
+    init_db()
     api_token = os.environ["NEPTUNE_API_TOKEN"]
     session = neptune.Session.with_default_backend(api_token=api_token)
     projects = session.get_projects("k-tonal")
@@ -51,7 +51,7 @@ def init_k_tonal(db):
     Exps = db.Experiments
     # RESET everything!
     # print("----> Dropping pre-existing Experiments Table")
-    Exps.drop()
+    # Exps.drop()
 
     for name, project in projects.items():
         if "experiment-" not in project.name:
