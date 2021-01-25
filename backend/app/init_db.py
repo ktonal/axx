@@ -43,6 +43,7 @@ def download_audios(index, project_name, exp_id):
 
 def init_k_tonal(db):
     print("---- Initializing K-TONAL ----")
+    print("--------------------", pd.__version__)
     init_db()
     api_token = os.environ["NEPTUNE_API_TOKEN"]
     session = neptune.Session.with_default_backend(api_token=api_token)
@@ -54,7 +55,7 @@ def init_k_tonal(db):
     # Exps.drop()
 
     for name, project in projects.items():
-        if "experiment-" not in project.name:
+        if project.name not in ("experiment-1", "experiment-2"):
             continue
 
         df = project.get_leaderboard()
