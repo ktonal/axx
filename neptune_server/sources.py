@@ -10,7 +10,7 @@ from flask import Blueprint, send_from_directory, request
 sources = Blueprint("sources", __name__)
 
 # the public folder from where we'll serve data
-PUBLIC_ROOT = "/tmp/neptune-server"
+PUBLIC_ROOT = "../files/"
 
 if not os.path.exists(PUBLIC_ROOT):
     os.mkdir(PUBLIC_ROOT)
@@ -106,8 +106,9 @@ def get_summary(project_name, experiment_id):
         return json.loads(f.read())
 
 
-@sources.route('/audio/<project_name>/<experiment_id>/<filename>/', methods=("GET",))
+@sources.route('/files/<project_name>/<experiment_id>/audios/<filename>/', methods=("GET",))
 def get_audio(project_name, experiment_id, filename):
+    print(os.path.exists(os.path.join(PUBLIC_ROOT, project_name, experiment_id, "audios", filename)))
     return send_from_directory(os.path.join(PUBLIC_ROOT, project_name, experiment_id, "audios"), filename)
 
 
