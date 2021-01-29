@@ -29,4 +29,5 @@ jobs:
         run: |
           npm install
           npm run build
+          sudo npm install -g gh-pages
           gh-pages -d build --user ${{ secrets.GIT_USER }}
