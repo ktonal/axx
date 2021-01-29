@@ -11,8 +11,6 @@ jobs:
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@v2.3.1
-        with:
-          persist-credentials: false
       - name: Setup Python & Build DB
         uses: actions/setup-python@v2
         with:
@@ -28,6 +26,4 @@ jobs:
       - name: Install, Build & Deploy
         run: |
           npm install
-          npm run build
-          sudo npm install -g gh-pages
-          gh-pages -d build --user ${{ secrets.GIT_USER }}
+          npm run deploy
