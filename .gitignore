@@ -2,3 +2,4 @@
 .eslintcache
 package-lock.json
 build/*
+public/files/*
