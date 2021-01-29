@@ -1,12 +1,10 @@
 import React, {useMemo, useState, useEffect} from "react";
-import axios from 'axios';
-import ReactTable, {
+import {
     useTable,
     useSortBy,
     useExpanded,
     useGroupBy,
     useColumnOrder,
-    useFilters,
     useGlobalFilter,
     useAsyncDebounce
 } from 'react-table';

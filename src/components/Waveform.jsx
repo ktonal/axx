@@ -46,7 +46,7 @@ export default function Waveform({url, title, handleFinish}) {
         // Removes events, elements and disconnects Web Audio nodes.
         // when component unmount
         return () => wavesurfer.current.destroy();
-    }, [url]);
+    }, [url, handleFinish]);
 
     const handlePlayPause = () => {
         setPlay(!playing);
