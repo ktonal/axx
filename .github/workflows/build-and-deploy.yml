@@ -25,9 +25,8 @@ jobs:
           python -m pip install --quiet --upgrade pip
           pip install --quiet -r requirements.txt
           python build-db.py
-      - name: Setup Git User
-        uses: fregante/setup-git-user@v1
       - name: Install, Build & Deploy
         run: |
           npm install
-          npm run deploy
+          npm run build
+          gh-pages -d build --user ${{ secrets.GIT_USER }}
