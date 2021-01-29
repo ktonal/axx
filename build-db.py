@@ -48,6 +48,7 @@ def build_db(prior_json, user, projects):
     print("--------------------", pd.__version__)
 
     api_token = os.environ["NEPTUNE_API_TOKEN"]
+    print(api_token)
     session = neptune.Session.with_default_backend(api_token=api_token)
     prior = [exp for exp in prior_json if exp.get("project", "") in projects]
     projects = {name: proj for name, proj in session.get_projects(user).items() if proj.name in projects}
