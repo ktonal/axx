@@ -11,8 +11,6 @@ jobs:
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@v2.3.1
-        with:
-          persist-credentials: false
       - name: Setup Python & Build DB
         uses: actions/setup-python@v2
         with:
@@ -25,8 +23,15 @@ jobs:
           python -m pip install --quiet --upgrade pip
           pip install --quiet -r requirements.txt
           python build-db.py
-
-      - name: Install, Build & Deploy
+      - name: Install & Build
         run: |
           npm install
-          npm run deploy
+          npm run build
+          
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@3.7.1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: gh-pages-test
+          FOLDER: build
+          CLEAN: true
