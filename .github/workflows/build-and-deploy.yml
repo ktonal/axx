@@ -1,9 +1,6 @@
 name: Build and Deploy
 
-on:
-  workflow_dispatch:
-  push:
-    branches: [undockerized]
+on: workflow_dispatch
 
 jobs:
   build-and-deploy:
