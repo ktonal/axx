@@ -91,7 +91,6 @@ def build_db(prior_json, user, projects):
 
 
 if __name__ == '__main__':
-    USER = "k-tonal"
-    PROJECTS = ("experiment-1", "experiment-2", "experiment-1-K3")
+    config = json.load(open("config.json"))
     prior = json.load(open("src/experiments.json", "r"))
-    build_db(prior, USER, PROJECTS)
+    build_db(prior, config["user"], config["projects"])
