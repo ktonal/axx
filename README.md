@@ -1,15 +1,16 @@
 # Audio eXperiment eXplorer
 
-Minimalistic SPA made with `React` to explore the outputs of audio generative models made with [`mimikit`](https://github.com/k-tonal/mimikit)
+Small web application to explore the outputs of audio generative models made with [`mimikit`](https://github.com/ktonal/mimikit)
 and stored in [neptune.ai](https://neptune.ai).
 
-Visit a [live demo](https://k-tonal.github.io/axx) containing experiments made by the k-tonal group. 
+Visit a [live demo](https://ktonal.github.io/axx) containing experiments made by ktonal.
 
-aXX is **still in early development!** But! There's still a couple of things you can do with it :
+Even though `aXX` is **still in early development!**, it does work and you can build and deploy the app to use it with your
+own data. See the next section for detailed instructions.
 
 ## Fork and Deploy
 
-You can fork this repository to your own github account and easily deploy a version of aXX displaying your data.
+You can fork this repository to your own github account and easily deploy a version of `aXX` displaying your data.
 
 To do this :
 
