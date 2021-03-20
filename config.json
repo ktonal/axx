@@ -1,4 +1,5 @@
 {
   "user": "k-tonal",
-  "projects": ["experiment-1", "experiment-2", "experiment-1-K3"]
+  "projects": ["experiment-Stimme"],
+  "columns": ["id", "files", "model_class", "loss", "n_layers", "frame_sizes", "kernel_size", "n_rnn", "net_dim", "gate_dim"]
 }

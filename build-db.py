@@ -43,7 +43,7 @@ def download_audios(index, project_name, exp_id):
         })
 
 
-def build_db(prior_json, user, projects):
+def build_db(prior_json, user, projects, columns):
     print("---- Initializing K-TONAL ----")
     print("--------------------", pd.__version__)
 
@@ -60,6 +60,7 @@ def build_db(prior_json, user, projects):
         df = df.rename(columns={name: re.sub(r"(channel_|parameter_)", "", name) for name in df.columns})
         df["running_time"] = pd.to_datetime(df.running_time, unit='s').dt.strftime("%Hh-%Mm-%Ss")
         df["created"] = df.created.dt.strftime('%B %d, %Y')
+        df = df.drop(columns=[col for col in df.columns if col not in columns])
         df = df.where(pd.notnull(df), "-")
 
         for e in prior:
@@ -93,4 +94,4 @@ def build_db(prior_json, user, projects):
 if __name__ == '__main__':
     config = json.load(open("config.json"))
     prior = json.load(open("src/experiments.json", "r"))
-    build_db(prior, config["user"], config["projects"])
+    build_db(prior, config["user"], config["projects"], config["columns"])
