@@ -128,10 +128,10 @@ function GlobalFilter({
     )
 }
 
-const AudioRow = React.memo(({ row, colSpan }) => {
+const AudioRow = React.memo(({row, colSpan}) => {
     // console.log(row.getRowProps());
     const [audiosURLs, setAudiosUrls] = React.useState(row.original["audios"]);
-    React.useEffect(()=> setAudiosUrls(row.original["audios"]), [row]);
+    React.useEffect(() => setAudiosUrls(row.original["audios"]), [row]);
     return <tr {...row.getRowProps()}>
         <td colSpan={colSpan} className={"audio-container"}>
             {audiosURLs ?
@@ -166,10 +166,14 @@ const initialVisibleColumns = [
     'n_rnn',
     'max_lr',
     'emphasis', 'sr',
+    'n_fft',
+    'n_layers',
+    'gate_dim',
+    'kernel_size',
     'reset_hidden',
 ];
 
-const Table = ({inputColumns, data }) => {
+const Table = ({inputColumns, data}) => {
     const initialGroupBy = ["model_class", "id"];
     const initialHidden = inputColumns.filter(
         c => c.id.toUpperCase() !== c.id && !initialVisibleColumns.includes(c.Header))
@@ -199,7 +203,7 @@ const Table = ({inputColumns, data }) => {
         useExpanded,
     );
     const audioRowRenderer = React.useCallback(
-        ({ row, colSpan }) => (
+        ({row, colSpan}) => (
             <AudioRow row={row} colSpan={colSpan}/>
         ),
         []
@@ -309,8 +313,8 @@ const Table = ({inputColumns, data }) => {
                                 </tr>
                                 {/*then the audios if the row is expanded */}
                                 {(row.isExpanded && !row.cells.some(cell => cell.isGrouped)) &&
-                                    audioRowRenderer( {row: row, colSpan: allColumns.length} )
-                                    }
+                                audioRowRenderer({row: row, colSpan: allColumns.length})
+                                }
                             </React.Fragment>
                         )
                     }
