@@ -19,7 +19,6 @@ export default function Waveform({url, title, handleFinish}) {
     const waveformRef = useRef(null);
     const wavesurfer = useRef(null);
     const [playing, setPlay] = useState(false);
-
     // create new WaveSurfer instance
     // On component mount and when url changes
     useEffect(() => {

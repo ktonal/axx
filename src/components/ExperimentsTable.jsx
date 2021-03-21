@@ -128,10 +128,38 @@ function GlobalFilter({
     )
 }
 
-const Table = ({inputColumns, data, audios}) => {
-    const initialGroupBy = ["project", "DB"];
+const AudioRow = React.memo(({ row, colSpan }) => {
+    // console.log(row.getRowProps());
+    const [audiosURLs, setAudiosUrls] = React.useState(row.original["audios"]);
+    React.useEffect(()=> setAudiosUrls(row.original["audios"]), [row]);
+    return <tr {...row.getRowProps()}>
+        <td colSpan={colSpan} className={"audio-container"}>
+            {audiosURLs ?
+                audiosURLs.map((x, i) => {
+                    return <Waveform
+                        key={x}
+                        url={escape(x)}
+                        title={x.split("/")[4]}
+                        handleFinish={() => {
+                            const list = audiosURLs;
+                            const index = list.indexOf(x) + 1;
+                            if (index < list.length) {
+                                const id = list[index].split("/")[4];
+                                const element = document.getElementById("play-" + id);
+                                element.click()
+                            }
+                        }}
+                    />
+                })
+                : <span style={{fontSize: "x-large"}}>No audio...</span>}
+        </td>
+    </tr>
+});
+
+const Table = ({inputColumns, data }) => {
+    const initialGroupBy = ["model_class"];
     const initialHidden = inputColumns.filter(
-        c => c.id.toUpperCase() !== c.id && !["Audios", "project", "accum_outputs", "pad_input", "with_skip_conv", "with_residual_conv"].includes(c.Header))
+        c => c.id.toUpperCase() !== c.id && !["Audios", "id", "files", "model_class", "loss", "n_layers", "frame_sizes", "kernel_size", "n_rnn", "net_dim", "gate_dim"].includes(c.Header))
         .map(c => c.id);
     const {
         getTableProps,
@@ -157,6 +185,13 @@ const Table = ({inputColumns, data, audios}) => {
         useSortBy,
         useExpanded,
     );
+    const audioRowRenderer = React.useCallback(
+        ({ row, colSpan }) => (
+            <AudioRow row={row} colSpan={colSpan}/>
+        ),
+        []
+    );
+
     return (
         <>
             <div className={"control-panel"}>
@@ -261,29 +296,8 @@ const Table = ({inputColumns, data, audios}) => {
                                 </tr>
                                 {/*then the audios if the row is expanded */}
                                 {(row.isExpanded && !row.cells.some(cell => cell.isGrouped)) &&
-                                <tr>
-                                    <td colSpan={allColumns.length} className={"audio-container"}>
-                                        {audios[row.original.id] ?
-                                            audios[row.original.id].map((x, i) => {
-                                                return <Waveform
-                                                    key={x}
-                                                    url={x}
-                                                    title={x.split("/")[4]}
-                                                    handleFinish={() => {
-                                                        const list = audios[row.original.id];
-                                                        const index = list.indexOf(x) + 1;
-                                                        if (index < list.length) {
-                                                            const id = list[index].split("/")[4];
-                                                            const element = document.getElementById("play-" + id);
-                                                            element.click()
-                                                        }
-                                                    }}
-                                                />
-                                            })
-                                            : <span style={{fontSize: "x-large"}}>No audio...</span>}
-                                    </td>
-                                </tr>
-                                }
+                                    audioRowRenderer( {row: row, colSpan: allColumns.length} )
+                                    }
                             </React.Fragment>
                         )
                     }
@@ -335,7 +349,8 @@ export default function ExperimentsTable() {
     const memoColumns = useMemo(() => columns, [columns]);
     const memoData = useMemo(() => data, [data]);
     // console.log(memoColumns);
+
     return (
-        <Table inputColumns={memoColumns} data={memoData} audios={audios}/>
+        <Table inputColumns={memoColumns} data={memoData}/>
     )
 }
