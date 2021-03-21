@@ -139,7 +139,7 @@ const AudioRow = React.memo(({ row, colSpan }) => {
                     console.log(x, escape(x));
                     return <Waveform
                         key={x}
-                        url={x}
+                        url={process.env.PUBLIC_URL + x}
                         title={x.split("/")[4]}
                         handleFinish={() => {
                             const list = audiosURLs;
