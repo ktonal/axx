@@ -156,10 +156,23 @@ const AudioRow = React.memo(({ row, colSpan }) => {
     </tr>
 });
 
+const initialVisibleColumns = [
+    "Audios", 'model_class', 'files',
+    "id", 'epoch',
+    'frame_sizes',
+    'net_dim',
+    'emb_dim',
+    'mlp_dim',
+    'n_rnn',
+    'max_lr',
+    'emphasis', 'sr',
+    'reset_hidden',
+];
+
 const Table = ({inputColumns, data }) => {
-    const initialGroupBy = ["model_class"];
+    const initialGroupBy = ["model_class", "id"];
     const initialHidden = inputColumns.filter(
-        c => c.id.toUpperCase() !== c.id && !["Audios", "id", "files", "model_class", "loss", "n_layers", "frame_sizes", "kernel_size", "n_rnn", "net_dim", "gate_dim"].includes(c.Header))
+        c => c.id.toUpperCase() !== c.id && !initialVisibleColumns.includes(c.Header))
         .map(c => c.id);
     const {
         getTableProps,
