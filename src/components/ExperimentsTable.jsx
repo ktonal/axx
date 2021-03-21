@@ -136,10 +136,10 @@ const AudioRow = React.memo(({ row, colSpan }) => {
         <td colSpan={colSpan} className={"audio-container"}>
             {audiosURLs ?
                 audiosURLs.map((x, i) => {
-                    console.log(x, escape(x));
+                    // console.log(x, escape(x));
                     return <Waveform
                         key={x}
-                        url={escape(x)}
+                        url={x}
                         title={x.split("/")[4]}
                         handleFinish={() => {
                             const list = audiosURLs;
