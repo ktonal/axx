@@ -1,6 +1,7 @@
-axx of some models trained with voices
+axx of most of the raw outputs that were used in our submission
+to the AIMC Conference 2021, "Le Mystère des voix neuronales".
 
-## [Visit the app](https://ktonal.github.io/Stimmen-axx)
+## [Visit the app](https://ktonal.github.io/voix-neuronales-axx)
 
 This is a fork of [axx](https://github.com/ktonal/axx).
 
