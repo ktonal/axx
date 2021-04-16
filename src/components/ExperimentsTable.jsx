@@ -138,7 +138,7 @@ const AudioRow = React.memo(({row, colSpan}) => {
                 audiosURLs.map((x, i) => {
                     return <Waveform
                         key={x}
-                        url={process.env.PUBLIC_URL + x}
+                        url={x}
                         title={x.split("/")[4]}
                         handleFinish={() => {
                             const list = audiosURLs;

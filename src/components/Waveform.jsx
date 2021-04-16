@@ -12,7 +12,7 @@ const waveSurferOptions = ref => ({
     responsive: true,
     height: 50,
     // Use the PeakCache to improve rendering speed of large waveforms.
-    partialRender: false
+    partialRender: false,
 });
 
 export default function Waveform({url, title, handleFinish}) {

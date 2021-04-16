@@ -1,0 +1,4 @@
+#!/usr/bin/env node
+
+console.log("HEY FROM AXX");
+console.log(process.argv);
