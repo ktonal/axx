@@ -153,26 +153,15 @@ const AudioRow = React.memo(({row, colSpan}) => {
         </td>
     </tr>
 });
-
-const initialVisibleColumns = [
-    "Audios", 'model_class', 'files',
-    "id", 'epoch',
-    'frame_sizes',
-    'net_dim',
-    'emb_dim',
-    'mlp_dim',
-    'n_rnn',
-    'max_lr',
-    'emphasis', 'sr',
-    'n_fft',
-    'n_layers',
-    'gate_dim',
-    'kernel_size',
-    'reset_hidden',
-];
+const initialGroupBy = [];
+const initialVisibleColumns = ["Audios"];
+axios.get("/config.json").then(resp => {
+    console.log(resp.data)
+    initialVisibleColumns.push(...resp.data.columns);
+    initialGroupBy.push(...resp.data.groupby);
+});
 
 const Table = ({inputColumns, data}) => {
-    const initialGroupBy = ["model_class", "id"];
     const initialHidden = inputColumns.filter(
         c => c.id.toUpperCase() !== c.id && !initialVisibleColumns.includes(c.Header))
         .map(c => c.id);

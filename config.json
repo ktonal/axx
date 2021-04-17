@@ -1,5 +1,0 @@
-{
-  "user": "k-tonal",
-  "projects": ["experiment-Stimme"],
-  "columns": ["id", "files", "model_class", "loss", "n_layers", "frame_sizes", "kernel_size", "n_rnn", "net_dim", "gate_dim"]
-}
