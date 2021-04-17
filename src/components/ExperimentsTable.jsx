@@ -10,10 +10,8 @@ import {
 } from 'react-table';
 import {DragDropContext, Droppable, Draggable} from "react-beautiful-dnd";
 import Waveform from "./Waveform";
-
+import axios from "axios";
 import '../App.scss';
-
-const jsonData = require("../experiments.json");
 
 function ColumnManager({getToggleHideAllColumnsProps, allColumns, setColumnOrder}) {
     const [stateCols, setState] = useState([]);
@@ -328,38 +326,40 @@ const Table = ({inputColumns, data}) => {
 export default function ExperimentsTable() {
     const [columns, setColumns] = useState([]);
     const [data, setData] = useState([]);
-    useEffect(() => {
-        // columns are dynamically defined so we need the set of
-        // keys in all the experiments
-        let columns = new Set();
-        jsonData.forEach(
-            item => Object.keys(item).forEach(val => {
-                if (!["_id", "audios"].includes(val)) {
-                    columns.add(val)
-                }
-            }));
-        columns = Array.from([...columns]);
-        // format and prepend extra columns for the UI
-        columns = columns.map(name => {
-            return {Header: name, accessor: name, id: name}
-        });
-        // column for expanding/collapsing audios
-        columns.unshift({
-            Header: "Audios",
-            id: 'expander',
-            Cell: ({row}) => (
-                <span {...row.getToggleRowExpandedProps()} className={"grouped-column"}>
+    useEffect( () => {
+        axios.get("/axx-data.json").then (response =>{
+            // columns are dynamically defined so we need the set of
+            // keys in all the experiments
+            let columns = new Set();
+            response.data.forEach(
+                item => Object.keys(item).forEach(val => {
+                    if (!["_id", "audios"].includes(val)) {
+                        columns.add(val)
+                    }
+                }));
+            columns = Array.from([...columns]);
+            // format and prepend extra columns for the UI
+            columns = columns.map(name => {
+                return {Header: name, accessor: name, id: name}
+            });
+            // column for expanding/collapsing audios
+            columns.unshift({
+                Header: "Audios",
+                id: 'expander',
+                Cell: ({row}) => (
+                    <span {...row.getToggleRowExpandedProps()} className={"grouped-column"}>
                             {row.isExpanded ?
                                 <i className={"fa fa-chevron-down"}/>
                                 : <i className={"fa fa-chevron-right"}/>}
-                    {(!row.cells.some(cell => cell.isGrouped) && row.original.hasOwnProperty("audios")) ?
-                        ` (${row.original.audios.length.toString()})`
-                        : null}
+                        {(!row.cells.some(cell => cell.isGrouped) && row.original.hasOwnProperty("audios")) ?
+                            ` (${row.original.audios.length.toString()})`
+                            : null}
                         </span>
-            )
-        });
-        setColumns(columns);
-        setData(jsonData);
+                )
+            });
+            setColumns(columns);
+            setData(response.data);
+        })
     }, []);
     const audios = {};
     data.forEach(exp => audios[exp.id] = exp.audios);
