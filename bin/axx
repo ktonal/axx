@@ -1,4 +1,7 @@
-#!/usr/bin/env node
+#!/bin/bash
 
-console.log("HEY FROM AXX");
-console.log(process.argv);
+http-server & pids=$!
+npm run --prefix /usr/local/lib/node_modules/axx start & pids+=" $!"
+
+trap "kill $pids" SIGTERM SIGINT
+wait $pids
