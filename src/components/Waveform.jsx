@@ -51,7 +51,6 @@ export default function Waveform({url, title, handleFinish}) {
         setPlay(!playing);
         wavesurfer.current.playPause();
     };
-
     return (
         // the container
         <div className={"waveform-element"}>

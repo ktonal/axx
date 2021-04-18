@@ -13,6 +13,8 @@ import Waveform from "./Waveform";
 import axios from "axios";
 import '../App.scss';
 
+const axiosConfig = {"headers": {"Cache-Control": "no-store, no-cache"}};
+
 function ColumnManager({getToggleHideAllColumnsProps, allColumns, setColumnOrder}) {
     const [stateCols, setState] = useState([]);
 
@@ -134,10 +136,11 @@ const AudioRow = React.memo(({row, colSpan}) => {
         <td colSpan={colSpan} className={"audio-container"}>
             {audiosURLs ?
                 audiosURLs.map((x, i) => {
+                    const splitedPath = x.split("/");
                     return <Waveform
                         key={x}
                         url={x}
-                        title={x.split("/")[4]}
+                        title={splitedPath[splitedPath.length - 1]}
                         handleFinish={() => {
                             const list = audiosURLs;
                             const index = list.indexOf(x) + 1;
@@ -155,10 +158,9 @@ const AudioRow = React.memo(({row, colSpan}) => {
 });
 const initialGroupBy = [];
 const initialVisibleColumns = ["Audios"];
-axios.get("/config.json").then(resp => {
-    console.log(resp.data)
+axios.get("/config.json", axiosConfig).then(resp => {
     initialVisibleColumns.push(...resp.data.columns);
-    initialGroupBy.push(...resp.data.groupby);
+    initialGroupBy.push(...resp.data.groupBy);
 });
 
 const Table = ({inputColumns, data}) => {
@@ -316,7 +318,7 @@ export default function ExperimentsTable() {
     const [columns, setColumns] = useState([]);
     const [data, setData] = useState([]);
     useEffect( () => {
-        axios.get("/axx-data.json").then (response =>{
+        axios.get("/axx-data.json", axiosConfig).then (response =>{
             // columns are dynamically defined so we need the set of
             // keys in all the experiments
             let columns = new Set();
