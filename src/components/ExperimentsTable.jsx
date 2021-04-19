@@ -145,7 +145,7 @@ const AudioRow = React.memo(({row, colSpan}) => {
                             const list = audiosURLs;
                             const index = list.indexOf(x) + 1;
                             if (index < list.length) {
-                                const id = list[index].split("/")[4];
+                                const id = list[index].split("/")[splitedPath.length - 1];
                                 const element = document.getElementById("play-" + id);
                                 element.click()
                             }
