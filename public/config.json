@@ -1,0 +1,9 @@
+{
+  "columns": [
+    "class",
+    "training-data"
+  ],
+  "groupBy": [
+    "training-data"
+  ]
+}

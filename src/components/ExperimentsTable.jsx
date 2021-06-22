@@ -10,10 +10,10 @@ import {
 } from 'react-table';
 import {DragDropContext, Droppable, Draggable} from "react-beautiful-dnd";
 import Waveform from "./Waveform";
-
+import axios from "axios";
 import '../App.scss';
 
-const jsonData = require("../experiments.json");
+const axiosConfig = {"headers": {"Cache-Control": "no-store, no-cache"}};
 
 function ColumnManager({getToggleHideAllColumnsProps, allColumns, setColumnOrder}) {
     const [stateCols, setState] = useState([]);
@@ -128,10 +128,44 @@ function GlobalFilter({
     )
 }
 
-const Table = ({inputColumns, data, audios}) => {
-    const initialGroupBy = ["project", "DB"];
+const AudioRow = React.memo(({row, colSpan}) => {
+    // console.log(row.getRowProps());
+    const [audiosURLs, setAudiosUrls] = React.useState(row.original["audios"]);
+    React.useEffect(() => setAudiosUrls(row.original["audios"]), [row]);
+    return <tr {...row.getRowProps()}>
+        <td colSpan={colSpan} className={"audio-container"}>
+            {audiosURLs ?
+                audiosURLs.map((x, i) => {
+                    const splitedPath = x.split("/");
+                    return <Waveform
+                        key={x}
+                        url={x}
+                        title={splitedPath[splitedPath.length - 1]}
+                        handleFinish={() => {
+                            const list = audiosURLs;
+                            const index = list.indexOf(x) + 1;
+                            if (index < list.length) {
+                                const id = list[index].split("/")[splitedPath.length - 1];
+                                const element = document.getElementById("play-" + id);
+                                element.click()
+                            }
+                        }}
+                    />
+                })
+                : <span style={{fontSize: "x-large"}}>No audio...</span>}
+        </td>
+    </tr>
+});
+const initialGroupBy = [];
+const initialVisibleColumns = ["Audios"];
+axios.get("config.json", axiosConfig).then(resp => {
+    initialVisibleColumns.push(...resp.data.columns);
+    initialGroupBy.push(...resp.data.groupBy);
+});
+
+const Table = ({inputColumns, data}) => {
     const initialHidden = inputColumns.filter(
-        c => c.id.toUpperCase() !== c.id && !["Audios", "project", "accum_outputs", "pad_input", "with_skip_conv", "with_residual_conv"].includes(c.Header))
+        c => c.id.toUpperCase() !== c.id && !initialVisibleColumns.includes(c.Header))
         .map(c => c.id);
     const {
         getTableProps,
@@ -157,6 +191,13 @@ const Table = ({inputColumns, data, audios}) => {
         useSortBy,
         useExpanded,
     );
+    const audioRowRenderer = React.useCallback(
+        ({row, colSpan}) => (
+            <AudioRow row={row} colSpan={colSpan}/>
+        ),
+        []
+    );
+
     return (
         <>
             <div className={"control-panel"}>
@@ -261,28 +302,7 @@ const Table = ({inputColumns, data, audios}) => {
                                 </tr>
                                 {/*then the audios if the row is expanded */}
                                 {(row.isExpanded && !row.cells.some(cell => cell.isGrouped)) &&
-                                <tr>
-                                    <td colSpan={allColumns.length} className={"audio-container"}>
-                                        {audios[row.original.id] ?
-                                            audios[row.original.id].map((x, i) => {
-                                                return <Waveform
-                                                    key={x}
-                                                    url={x}
-                                                    title={x.split("/")[4]}
-                                                    handleFinish={() => {
-                                                        const list = audios[row.original.id];
-                                                        const index = list.indexOf(x) + 1;
-                                                        if (index < list.length) {
-                                                            const id = list[index].split("/")[4];
-                                                            const element = document.getElementById("play-" + id);
-                                                            element.click()
-                                                        }
-                                                    }}
-                                                />
-                                            })
-                                            : <span style={{fontSize: "x-large"}}>No audio...</span>}
-                                    </td>
-                                </tr>
+                                audioRowRenderer({row: row, colSpan: allColumns.length})
                                 }
                             </React.Fragment>
                         )
@@ -297,45 +317,48 @@ const Table = ({inputColumns, data, audios}) => {
 export default function ExperimentsTable() {
     const [columns, setColumns] = useState([]);
     const [data, setData] = useState([]);
-    useEffect(() => {
-        // columns are dynamically defined so we need the set of
-        // keys in all the experiments
-        let columns = new Set();
-        jsonData.forEach(
-            item => Object.keys(item).forEach(val => {
-                if (!["_id", "audios"].includes(val)) {
-                    columns.add(val)
-                }
-            }));
-        columns = Array.from([...columns]);
-        // format and prepend extra columns for the UI
-        columns = columns.map(name => {
-            return {Header: name, accessor: name, id: name}
-        });
-        // column for expanding/collapsing audios
-        columns.unshift({
-            Header: "Audios",
-            id: 'expander',
-            Cell: ({row}) => (
-                <span {...row.getToggleRowExpandedProps()} className={"grouped-column"}>
+    useEffect( () => {
+        axios.get("experiments.json", axiosConfig).then (response =>{
+            // columns are dynamically defined so we need the set of
+            // keys in all the experiments
+            let columns = new Set();
+            response.data.forEach(
+                item => Object.keys(item).forEach(val => {
+                    if (!["_id", "audios"].includes(val)) {
+                        columns.add(val)
+                    }
+                }));
+            columns = Array.from([...columns]);
+            // format and prepend extra columns for the UI
+            columns = columns.map(name => {
+                return {Header: name, accessor: name, id: name}
+            });
+            // column for expanding/collapsing audios
+            columns.unshift({
+                Header: "Audios",
+                id: 'expander',
+                Cell: ({row}) => (
+                    <span {...row.getToggleRowExpandedProps()} className={"grouped-column"}>
                             {row.isExpanded ?
                                 <i className={"fa fa-chevron-down"}/>
                                 : <i className={"fa fa-chevron-right"}/>}
-                    {(!row.cells.some(cell => cell.isGrouped) && row.original.hasOwnProperty("audios")) ?
-                        ` (${row.original.audios.length.toString()})`
-                        : null}
+                        {(!row.cells.some(cell => cell.isGrouped) && row.original.hasOwnProperty("audios")) ?
+                            ` (${row.original.audios.length.toString()})`
+                            : null}
                         </span>
-            )
-        });
-        setColumns(columns);
-        setData(jsonData);
+                )
+            });
+            setColumns(columns);
+            setData(response.data);
+        })
     }, []);
     const audios = {};
     data.forEach(exp => audios[exp.id] = exp.audios);
     const memoColumns = useMemo(() => columns, [columns]);
     const memoData = useMemo(() => data, [data]);
     // console.log(memoColumns);
+
     return (
-        <Table inputColumns={memoColumns} data={memoData} audios={audios}/>
+        <Table inputColumns={memoColumns} data={memoData}/>
     )
 }
