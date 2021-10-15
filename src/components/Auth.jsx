@@ -11,7 +11,6 @@ function Login(props) {
         if (id_token){
             props.setToken(id_token);
         }
-        // setCookie('refresh_token', response.data.refresh_token, {path: '/', expires})
     };
     const onFailure = (res) => {
         props.setLoggedIn(false);
@@ -23,7 +22,7 @@ function Login(props) {
                          onSuccess={onSuccess}
                          onFailure={onFailure}
                          cookiePolicy={"single_host_origin"}
-                         isSignedIn={true}
+                         isSignedIn={props.isSignedIn}
             />
         </div>
     )

@@ -91,6 +91,7 @@ export default function ExperimentsTable(props) {
     const [columns, setColumns] = useState([]);
     const [data, setData] = useState([]);
     useEffect(() => {
+        console.log("Update Table");
         axiosConfig.headers.Authorization = "Bearer " + token;
         axios.get("table/", axiosConfig).then(response => {
             // columns are dynamically defined so we need the set of
