@@ -1,6 +1,5 @@
 import React, {useEffect, useRef, useState} from "react";
 import WaveSurfer from "wavesurfer.js";
-import {useCookies} from "react-cookie";
 
 const waveSurferOptions = ref => ({
     container: ref,
@@ -16,8 +15,7 @@ const waveSurferOptions = ref => ({
     partialRender: false
 });
 
-export default function Waveform({url, title, handleFinish}) {
-    const [cookies,] = useCookies(["user_id_token"]);
+export default function Waveform({url, title, handleFinish, token}) {
     const waveformRef = useRef(null);
     const wavesurfer = useRef(null);
     const [playing, setPlay] = useState(false);
@@ -31,7 +29,7 @@ export default function Waveform({url, title, handleFinish}) {
         options.xhr = {
             requestHeaders: [{
                 key: "Authorization",
-                value: "Bearer " + cookies.user_id_token
+                value: "Bearer " + token
             }]
         };
         wavesurfer.current = WaveSurfer.create(options);
@@ -54,7 +52,7 @@ export default function Waveform({url, title, handleFinish}) {
         // Removes events, elements and disconnects Web Audio nodes.
         // when component unmount
         return () => wavesurfer.current.destroy();
-    }, [url, handleFinish, cookies.user_id_token]);
+    }, [url, handleFinish, token]);
 
     const handlePlayPause = () => {
         setPlay(!playing);

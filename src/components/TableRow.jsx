@@ -5,7 +5,7 @@ export function TableRow(props) {
     return <React.Fragment>
         {/* first we display the params of the experiment */}
         <tr {...props.row.getRowProps()}>
-            {props.row.cells.map(cell => <FormatedCell cell={cell} row={props.row}/>)}
+            {props.row.cells.map((cell, i) => <FormatedCell cell={cell} row={props.row} key={i}/>)}
         </tr>
         {/*then the audios if the row is expanded */}
         {(props.row.isExpanded && !props.row.cells.some(cell => cell.isGrouped)) &&
@@ -31,11 +31,11 @@ function FormatedCell(props) {
         {props.cell.isGrouped ? (
             // If it's a grouped cell, add an expander and row count
             <>
-                                                  <span {...props.row.getToggleRowExpandedProps()}>
-                                                    {props.row.isExpanded ? <i className={"fa fa-chevron-down"}/> :
-                                                        <i className={"fa fa-chevron-right"}/>}
-                                                  </span>{" "}
-                {props.cell.render("Cell")} ({props.row.subRows.length})
+          <span {...props.row.getToggleRowExpandedProps()}>
+            {props.row.isExpanded ? <i className={"fa fa-chevron-down"}/> :
+                <i className={"fa fa-chevron-right"}/>}
+          </span>{" "}
+            {props.cell.render("Cell")} ({props.row.subRows.length})
             </>
         ) : props.cell.isAggregated ? (
             // If the cell is aggregated, use the Aggregated

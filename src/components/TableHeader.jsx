@@ -3,8 +3,8 @@ import React from "react";
 
 export function TableHeader(props) {
     return <thead>
-    {props.headerGroups.map(headerGroup => (
-        <TableHeaderRow headerGroup={headerGroup}/>
+    {props.headerGroups.map((headerGroup, i) => (
+        <TableHeaderRow headerGroup={headerGroup} key={i}/>
     ))}
     </thead>;
 }
@@ -15,8 +15,9 @@ TableHeader.propTypes = {
 
 function TableHeaderRow(props) {
     return <tr {...props.headerGroup.getHeaderGroupProps()}>
-        {props.headerGroup.headers.map(column =>
-            <TableHeaderColumn column={column} onClick={() => column.toggleHidden(true)}/>
+        {props.headerGroup.headers.map((column, i) =>
+            <TableHeaderColumn column={column} onClick={() => column.toggleHidden(true)}
+                                key={i}/>
         )}
     </tr>;
 }

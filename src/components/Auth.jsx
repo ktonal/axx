@@ -1,18 +1,15 @@
 import React from "react";
-import { useCookies } from 'react-cookie';
 import {GoogleLogin} from "react-google-login";
 
 const client_id = "955131018414-f46kce80kqakmpofouoief34050ni8e0.apps.googleusercontent.com";
 
 
 function Login(props) {
-    const { setCookie } = useCookies(['user_id_token']);
 
     const onSuccess = (res) => {
         const id_token = res.getAuthResponse().id_token;
-        setCookie('user_id_token', id_token, { path: '/'});
         if (id_token){
-            props.setLoggedIn(true);
+            props.setToken(id_token);
         }
         // setCookie('refresh_token', response.data.refresh_token, {path: '/', expires})
     };

@@ -1,7 +1,7 @@
 import React from "react";
 import Waveform from "./Waveform";
 
-export const AudioRow = React.memo(({row, colSpan}) => {
+export const AudioRow = React.memo(({row, colSpan, token}) => {
     const [audiosURLs, setAudiosUrls] = React.useState(row.original["audios"]);
     React.useEffect(() => setAudiosUrls(row.original["audios"]), [row]);
     return <tr {...row.getRowProps()}>
@@ -22,6 +22,7 @@ export const AudioRow = React.memo(({row, colSpan}) => {
                                 element.click()
                             }
                         }}
+                        token={token}
                     />
                 })
                 : <span style={{fontSize: "x-large"}}>No audio...</span>}

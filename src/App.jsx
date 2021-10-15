@@ -27,7 +27,7 @@ class Modal extends React.Component {
 }
 
 export default function App() {
-    const [loggedIn, setLoggedIn] = React.useState(false);
+    const [token, setToken] = React.useState(false);
     const [withInfos, setInfos] = React.useState(false);
     return (
         <div className={"App"}>
@@ -52,10 +52,10 @@ export default function App() {
                         <p>All the sounds & experiments shown on this page have been made by the group k-tonal (website coming soon!) with their own <a href={"https://github.com/k-tonal/mimikit"}>mimikit</a>, a python package for doing deep-learning with your own audios.</p>
                     </Modal>
                     : null}
-                <Login setLoggedIn={setLoggedIn}/>
+                <Login setToken={setToken}/>
             </div>
-            {loggedIn ?
-                <ExperimentsTable/>
+            {token ?
+                <ExperimentsTable token={token}/>
                 : null}
         </div>
     );
