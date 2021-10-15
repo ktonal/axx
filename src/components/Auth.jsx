@@ -22,7 +22,7 @@ function Login(props) {
                          onSuccess={onSuccess}
                          onFailure={onFailure}
                          cookiePolicy={"single_host_origin"}
-                         isSignedIn={props.isSignedIn}
+                         isSignedIn={false}
             />
         </div>
     )
