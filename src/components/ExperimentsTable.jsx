@@ -127,7 +127,7 @@ export default function ExperimentsTable() {
             initialVisibleColumns.push(...columns);
             setData(Object.values(response.data).map(value => {return {"audios": value["audios"], ...value["json"]["network"]}}));
         }).catch(err => {})
-    }, []);
+    }, [cookies.user_id_token]);
     const audios = {};
     data.forEach((value, id) => audios[id] = value["audios"]);
     const memoColumns = useMemo(() => columns, [columns]);

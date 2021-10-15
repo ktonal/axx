@@ -11,7 +11,7 @@ export const AudioRow = React.memo(({row, colSpan}) => {
                     const splitedPath = x.split("/");
                     return <Waveform
                         key={x}
-                        url={"https://bucket-proxy-uq7zn3wa7a-oa.a.run.app" + "/bytes/" + x}
+                        url={"https://bucket-proxy-uq7zn3wa7a-oa.a.run.app/bytes/" + x}
                         title={splitedPath[splitedPath.length - 1]}
                         handleFinish={() => {
                             const list = audiosURLs;

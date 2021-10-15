@@ -6,7 +6,7 @@ const client_id = "955131018414-f46kce80kqakmpofouoief34050ni8e0.apps.googleuser
 
 
 function Login(props) {
-    const [cookies, setCookie] = useCookies(['user_id_token']);
+    const { setCookie } = useCookies(['user_id_token']);
 
     const onSuccess = (res) => {
         const id_token = res.getAuthResponse().id_token;
