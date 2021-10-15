@@ -13,7 +13,8 @@ function Login(props) {
         }
     };
     const onFailure = (res) => {
-        props.setToken(undefined);
+        props.setToken(false);
+        console.log(res)
     };
     return (
         <div>

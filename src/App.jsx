@@ -29,7 +29,7 @@ class Modal extends React.Component {
 export default function App() {
     const [token, setToken] = React.useState(false);
     const [withInfos, setInfos] = React.useState(false);
-    console.log(token!==false)
+    console.log(token);
     return (
         <div className={"App"}>
             <div className={"header"}>
