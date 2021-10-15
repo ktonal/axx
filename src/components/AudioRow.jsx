@@ -2,7 +2,6 @@ import React from "react";
 import Waveform from "./Waveform";
 
 export const AudioRow = React.memo(({row, colSpan}) => {
-    // console.log(row.getRowProps());
     const [audiosURLs, setAudiosUrls] = React.useState(row.original["audios"]);
     React.useEffect(() => setAudiosUrls(row.original["audios"]), [row]);
     return <tr {...row.getRowProps()}>
@@ -12,7 +11,7 @@ export const AudioRow = React.memo(({row, colSpan}) => {
                     const splitedPath = x.split("/");
                     return <Waveform
                         key={x}
-                        url={x}
+                        url={"/bytes/" + x}
                         title={splitedPath[splitedPath.length - 1]}
                         handleFinish={() => {
                             const list = audiosURLs;

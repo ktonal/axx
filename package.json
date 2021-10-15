@@ -1,6 +1,6 @@
 {
-  "__note__":  "remove the next line for finding the audios in the dev version!",
-  "homepage": "https://ktonal.github.io/axx",
+  "__note__": "remove the next line for finding the audios in the dev version!",
+  "homepage": "http://0.0.0.0:80/",
   "name": "axx",
   "version": "0.1.0",
   "private": true,
@@ -18,7 +18,9 @@
     "node-sass": "^4.14.1",
     "react": "^17.0.1",
     "react-beautiful-dnd": "^13.0.0",
+    "react-cookie": "^4.1.1",
     "react-dom": "^17.0.1",
+    "react-google-login": "^5.2.2",
     "react-scripts": "4.0.1",
     "react-table": "^7.6.3",
     "uuid": "^8.3.2",

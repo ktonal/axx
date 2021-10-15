@@ -2,6 +2,7 @@ import React from "react";
 import "./App.scss";
 
 import ExperimentsTable from "./components/ExperimentsTable";
+import Login from "./components/Auth";
 
 class Modal extends React.Component {
     close(e) {
@@ -26,6 +27,7 @@ class Modal extends React.Component {
 }
 
 export default function App() {
+    const [loggedIn, setLoggedIn] = React.useState(false);
     const [withInfos, setInfos] = React.useState(false);
     return (
         <div className={"App"}>
@@ -50,8 +52,11 @@ export default function App() {
                         <p>All the sounds & experiments shown on this page have been made by the group k-tonal (website coming soon!) with their own <a href={"https://github.com/k-tonal/mimikit"}>mimikit</a>, a python package for doing deep-learning with your own audios.</p>
                     </Modal>
                     : null}
+                <Login setLoggedIn={setLoggedIn}/>
             </div>
-            <ExperimentsTable/>
+            {loggedIn ?
+                <ExperimentsTable/>
+                : null}
         </div>
     );
 }

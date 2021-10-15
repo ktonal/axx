@@ -1,4 +1,5 @@
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useEffect, useMemo, useState } from "react";
+import { useCookies } from 'react-cookie';
 import {useColumnOrder, useExpanded, useGlobalFilter, useGroupBy, useSortBy, useTable} from 'react-table';
 import axios from "axios";
 import '../App.scss';
@@ -8,14 +9,13 @@ import {AudioRow} from "./AudioRow";
 import {TableRow} from "./TableRow";
 import {TableHeader} from "./TableHeader";
 
-const axiosConfig = {"headers": {"Cache-Control": "no-store, no-cache"}};
+const axiosConfig = {
+    "baseURL": "http://127.0.0.1:80",
+    "headers": {"Cache-Control": "no-store, no-cache", "Authorization": ""}
+};
 
 const initialGroupBy = [];
 const initialVisibleColumns = ["Audios"];
-axios.get("config.json", axiosConfig).then(resp => {
-    initialVisibleColumns.push(...resp.data.columns);
-    initialGroupBy.push(...resp.data.groupBy);
-});
 
 const Table = ({inputColumns, data}) => {
     const initialHidden = inputColumns.filter(
@@ -88,17 +88,19 @@ const Table = ({inputColumns, data}) => {
 };
 
 export default function ExperimentsTable() {
+    const [cookies,] = useCookies(["user_id_token"]);
     const [columns, setColumns] = useState([]);
     const [data, setData] = useState([]);
     useEffect(() => {
-        axios.get("experiments.json", axiosConfig).then(response => {
+        axiosConfig.headers.Authorization = "Bearer " + cookies.user_id_token;
+        axios.get("table/", axiosConfig).then(response => {
             // columns are dynamically defined so we need the set of
             // keys in all the experiments
             let columns = new Set();
-            response.data.forEach(
-                item => Object.keys(item).forEach(val => {
-                    if (!["_id", "audios"].includes(val)) {
-                        columns.add(val)
+            Object.values(response.data).forEach(
+                item => Object.keys(item["json"]["network"]).forEach(key => {
+                    if (!["_id", "audios"].includes(key)) {
+                        columns.add(key)
                     }
                 }));
             columns = Array.from([...columns]);
@@ -122,14 +124,14 @@ export default function ExperimentsTable() {
                 )
             });
             setColumns(columns);
-            setData(response.data);
-        })
+            initialVisibleColumns.push(...columns);
+            setData(Object.values(response.data).map(value => {return {"audios": value["audios"], ...value["json"]["network"]}}));
+        }).catch(err => {})
     }, []);
     const audios = {};
-    data.forEach(exp => audios[exp.id] = exp.audios);
+    data.forEach((value, id) => audios[id] = value["audios"]);
     const memoColumns = useMemo(() => columns, [columns]);
     const memoData = useMemo(() => data, [data]);
-    // console.log(memoColumns);
 
     return (
         <Table inputColumns={memoColumns} data={memoData}/>

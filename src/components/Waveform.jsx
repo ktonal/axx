@@ -1,5 +1,6 @@
 import React, {useEffect, useRef, useState} from "react";
 import WaveSurfer from "wavesurfer.js";
+import {useCookies} from "react-cookie";
 
 const waveSurferOptions = ref => ({
     container: ref,
@@ -16,6 +17,7 @@ const waveSurferOptions = ref => ({
 });
 
 export default function Waveform({url, title, handleFinish}) {
+    const [cookies,] = useCookies(["user_id_token"]);
     const waveformRef = useRef(null);
     const wavesurfer = useRef(null);
     const [playing, setPlay] = useState(false);
@@ -26,6 +28,12 @@ export default function Waveform({url, title, handleFinish}) {
         setPlay(false);
 
         const options = waveSurferOptions(waveformRef.current);
+        options.xhr = {
+            requestHeaders: [{
+                key: "Authorization",
+                value: "Bearer " + cookies.user_id_token
+            }]
+        };
         wavesurfer.current = WaveSurfer.create(options);
 
         wavesurfer.current.load(url);
