@@ -13,7 +13,7 @@ function Login(props) {
         }
     };
     const onFailure = (res) => {
-        props.setLoggedIn(false);
+        props.setToken(undefined);
     };
     return (
         <div>
