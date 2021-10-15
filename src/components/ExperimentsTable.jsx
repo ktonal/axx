@@ -10,7 +10,7 @@ import {TableRow} from "./TableRow";
 import {TableHeader} from "./TableHeader";
 
 const axiosConfig = {
-    "baseURL": "http://127.0.0.1:80",
+    "baseURL": "https://bucket-proxy-uq7zn3wa7a-oa.a.run.app",
     "headers": {"Cache-Control": "no-store, no-cache", "Authorization": ""}
 };
 
