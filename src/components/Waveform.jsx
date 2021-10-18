@@ -1,5 +1,7 @@
 import React, {useEffect, useRef, useState} from "react";
 import WaveSurfer from "wavesurfer.js";
+import axios from "axios";
+
 
 const waveSurferOptions = ref => ({
     container: ref,
@@ -15,7 +17,7 @@ const waveSurferOptions = ref => ({
     partialRender: false
 });
 
-export default function Waveform({url, title, handleFinish, token}) {
+export default function Waveform({url, title, path, handleFinish, token}) {
     const waveformRef = useRef(null);
     const wavesurfer = useRef(null);
     const [playing, setPlay] = useState(false);
@@ -30,6 +32,9 @@ export default function Waveform({url, title, handleFinish, token}) {
             requestHeaders: [{
                 key: "Authorization",
                 value: "Bearer " + token
+            }, {
+                key: "Cache-Control",
+                value: "public, max-age=604800, immutable"
             }]
         };
         wavesurfer.current = WaveSurfer.create(options);
@@ -40,14 +45,14 @@ export default function Waveform({url, title, handleFinish, token}) {
             if (wavesurfer.current) {
                 wavesurfer.current.setVolume(0.5);
             }
-        wavesurfer.current.on("seek", () => {
-            setPlay(true);
-            wavesurfer.current.play()
-        });
-        wavesurfer.current.on("finish", () => {
-            handleFinish()
-            setPlay(false)
-        });
+            wavesurfer.current.on("seek", () => {
+                setPlay(true);
+                wavesurfer.current.play()
+            });
+            wavesurfer.current.on("finish", () => {
+                handleFinish()
+                setPlay(false)
+            });
         });
         // Removes events, elements and disconnects Web Audio nodes.
         // when component unmount
@@ -68,9 +73,39 @@ export default function Waveform({url, title, handleFinish, token}) {
                    id={`play-${title}`}
                    onClick={handlePlayPause}>
                 </i>
-                <span className={"waveform-title"}>
-                {"  " + title}
-                </span>
+                <i className={"download-button fa fa-download"}
+                   style={{padding: "0 6px", fontSize: "x-large", color: "#a0d78f"}}
+                   onClick={() => {
+                       axios.get(url,
+                           {
+                               headers: {
+                                   "Authorization": "Bearer " + token
+                               }
+                           }).then(res => {
+                           const url = window.URL.createObjectURL(new Blob([res.data]));
+                           const link = document.createElement('a');
+                           link.href = url;
+                           link.setAttribute('download', path); //or any other extension
+                           document.body.appendChild(link);
+                           link.click();
+                           // console.log(res)
+                       })
+                   }}
+                />
+                <i className={"trash-button fa fa-trash"}
+                   style={{padding: "0 6px", fontSize: "x-large", color: "#d78377"}}
+                   onClick={() => {
+                       if (window.confirm("Are you sure you want to delete this?")) {
+                           axios.delete(process.env.REACT_APP_BACKEND_URL + path, {
+                               headers: {
+                                   "Authorization": "Bearer " + token
+                               }
+                           })
+                       }
+                   }}
+                />
+                <span className={"waveform-title"}>{"  " + title}</span>
+                {/*</a>*/}
             </div>
             {/* the waveform (ui kit must be turned off for it to display correctly) */}
             <div className={"waveform"}

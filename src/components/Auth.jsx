@@ -3,8 +3,7 @@ import {GoogleLogin} from "react-google-login";
 
 const client_id = "955131018414-f46kce80kqakmpofouoief34050ni8e0.apps.googleusercontent.com";
 
-
-function Login(props) {
+export function Login(props) {
 
     const onSuccess = (res) => {
         const id_token = res.getAuthResponse().id_token;
@@ -28,5 +27,3 @@ function Login(props) {
         </div>
     )
 }
-
-export default Login;

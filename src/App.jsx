@@ -2,7 +2,7 @@ import React from "react";
 import "./App.scss";
 
 import ExperimentsTable from "./components/ExperimentsTable";
-import Login from "./components/Auth";
+import {Login} from "./components/Auth";
 
 class Modal extends React.Component {
     close(e) {
@@ -25,6 +25,7 @@ class Modal extends React.Component {
         );
     }
 }
+
 
 export default function App() {
     const [token, setToken] = React.useState(false);

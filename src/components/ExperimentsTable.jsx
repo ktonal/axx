@@ -9,7 +9,7 @@ import {TableRow} from "./TableRow";
 import {TableHeader} from "./TableHeader";
 
 const axiosConfig = {
-    "baseURL": "https://bucket-proxy-uq7zn3wa7a-oa.a.run.app",
+    "baseURL": process.env.REACT_APP_BACKEND_URL,
     "headers": {"Cache-Control": "no-store, no-cache", "Authorization": ""}
 };
 
@@ -17,9 +17,10 @@ const initialGroupBy = [];
 const initialVisibleColumns = ["Audios"];
 
 const Table = ({inputColumns, data, token}) => {
-    const initialHidden = inputColumns.filter(
-        c => c.id.toUpperCase() !== c.id && !initialVisibleColumns.includes(c.Header))
-        .map(c => c.id);
+    // const initialHidden = inputColumns.filter(
+    //     c => c.id.toUpperCase() !== c.id && !initialVisibleColumns.includes(c.Header))
+    //     .map(c => c.id);
+    const initialHidden = [];
     const {
         getTableProps,
         getTableBodyProps,
@@ -96,6 +97,8 @@ export default function ExperimentsTable(props) {
             // columns are dynamically defined so we need the set of
             // keys in all the experiments
             let columns = new Set();
+            // console.log(response.data);
+
             Object.values(response.data).forEach(
                 item => Object.keys(item["json"]["network"]).forEach(key => {
                     if (!["_id", "audios"].includes(key)) {
@@ -129,6 +132,7 @@ export default function ExperimentsTable(props) {
     }, [token]);
     const audios = {};
     data.forEach((value, id) => audios[id] = value["audios"]);
+    // console.log(data);
     const memoColumns = useMemo(() => columns, [columns]);
     const memoData = useMemo(() => data, [data]);
 
