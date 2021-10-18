@@ -1,7 +1,8 @@
-import React, {useEffect, useMemo, useState } from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {useColumnOrder, useExpanded, useGlobalFilter, useGroupBy, useSortBy, useTable} from 'react-table';
 import axios from "axios";
 import '../App.scss';
+import {AuthContext} from "./Auth";
 import {ColumnManager} from "./ColumnManager";
 import {GlobalFilter} from "./GlobalFilter";
 import {AudioRow} from "./AudioRow";
@@ -16,7 +17,8 @@ const axiosConfig = {
 const initialGroupBy = [];
 const initialVisibleColumns = ["Audios"];
 
-const Table = ({inputColumns, data, token}) => {
+const Table = ({inputColumns, data}) => {
+    const {token} = React.useContext(AuthContext);
     // const initialHidden = inputColumns.filter(
     //     c => c.id.toUpperCase() !== c.id && !initialVisibleColumns.includes(c.Header))
     //     .map(c => c.id);
@@ -87,8 +89,8 @@ const Table = ({inputColumns, data, token}) => {
     )
 };
 
-export default function ExperimentsTable(props) {
-    const token = props.token;
+export default function ExperimentsTable() {
+    const {token} = React.useContext(AuthContext);
     const [columns, setColumns] = useState([]);
     const [data, setData] = useState([]);
     useEffect(() => {
@@ -127,8 +129,11 @@ export default function ExperimentsTable(props) {
             });
             setColumns(columns);
             initialVisibleColumns.push(...columns);
-            setData(Object.values(response.data).map(value => {return {"audios": value["audios"], ...value["json"]["network"]}}));
-        }).catch(err => {})
+            setData(Object.values(response.data).map(value => {
+                return {"audios": value["audios"], ...value["json"]["network"]}
+            }));
+        }).catch(err => {
+        })
     }, [token]);
     const audios = {};
     data.forEach((value, id) => audios[id] = value["audios"]);
@@ -137,6 +142,6 @@ export default function ExperimentsTable(props) {
     const memoData = useMemo(() => data, [data]);
 
     return (
-        <Table inputColumns={memoColumns} data={memoData} token={token}/>
+        <Table inputColumns={memoColumns} data={memoData}/>
     )
 }

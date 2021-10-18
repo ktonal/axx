@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from "react";
 import WaveSurfer from "wavesurfer.js";
 import axios from "axios";
-
+import {AuthContext} from "./Auth";
 
 const waveSurferOptions = ref => ({
     container: ref,
@@ -17,7 +17,8 @@ const waveSurferOptions = ref => ({
     partialRender: false
 });
 
-export default function Waveform({url, title, path, handleFinish, token}) {
+export default function Waveform({url, title, path, handleFinish}) {
+    const {token} = React.useContext(AuthContext);
     const waveformRef = useRef(null);
     const wavesurfer = useRef(null);
     const [playing, setPlay] = useState(false);

@@ -3,8 +3,9 @@ import {GoogleLogin} from "react-google-login";
 
 const client_id = "955131018414-f46kce80kqakmpofouoief34050ni8e0.apps.googleusercontent.com";
 
-export function Login(props) {
+export const AuthContext = React.createContext({token: "", setToken: () => {}});
 
+export function Login(props) {
     const onSuccess = (res) => {
         const id_token = res.getAuthResponse().id_token;
         if (id_token){
