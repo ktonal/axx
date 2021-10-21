@@ -17,8 +17,36 @@ const axiosConfig = {
 const initialGroupBy = [];
 const initialVisibleColumns = ["Audios"];
 
-const Table = ({inputColumns, data}) => {
-    const {token} = React.useContext(AuthContext);
+// Create an editable cell renderer
+const EditableCell = ({
+                          value: initialValue,
+                          row: {index},
+                          column: {id},
+                          updateData, // This is a custom function that we supplied to our table instance
+                      }) => {
+    // We need to keep and update the state of the cell normally
+    const [value, setValue] = React.useState(initialValue);
+
+    const onChange = e => {
+        setValue(e.target.value)
+    };
+
+    // We'll only update the external data when the input is blurred
+    const onBlur = () => {
+        updateData(index, id, value)
+    };
+
+    // If the initialValue is changed external, sync it up with our state
+    React.useEffect(() => {
+        setValue(initialValue)
+    }, [initialValue]);
+
+    return <input value={value} onChange={onChange} onBlur={onBlur} type={"text"}
+                  style={{color: "inherit", border: "0px", fontSize: "inherit"}}/>
+};
+
+const Table = ({inputColumns, data, updateData,
+                   addRowIcon, addBlob, removeBlob}) => {
     // const initialHidden = inputColumns.filter(
     //     c => c.id.toUpperCase() !== c.id && !initialVisibleColumns.includes(c.Header))
     //     .map(c => c.id);
@@ -35,11 +63,16 @@ const Table = ({inputColumns, data}) => {
         state,
         setGlobalFilter
     } = useTable({
-            columns: inputColumns, data,
+            columns: inputColumns,
+            data,
             initialState: {
                 groupBy: initialGroupBy,
                 hiddenColumns: initialHidden
-            }
+            },
+            defaultColumn: {
+                Cell: EditableCell,
+            },
+            updateData
         },
         useColumnOrder,
         useGlobalFilter,
@@ -47,13 +80,16 @@ const Table = ({inputColumns, data}) => {
         useSortBy,
         useExpanded,
     );
+
     const audioRowRenderer = React.useCallback(
         ({row, colSpan}) => (
-            <AudioRow row={row} colSpan={colSpan} token={token}/>
+            <AudioRow row={row} colSpan={colSpan}
+                      addBlob={addBlob}
+                      removeBlob={removeBlob}
+            />
         ),
-        [token]
+        [addBlob, removeBlob]
     );
-
     return (
         <>
             <div className={"control-panel"}>
@@ -72,6 +108,7 @@ const Table = ({inputColumns, data}) => {
             {/*<pre>{JSON.stringify(state, null, 2)}</pre>*/}
             {/* The Table */}
             <br/>
+            {addRowIcon()}
             <table {...getTableProps()}>
                 <TableHeader headerGroups={headerGroups}/>
                 <tbody {...getTableBodyProps()}>
@@ -89,24 +126,24 @@ const Table = ({inputColumns, data}) => {
     )
 };
 
-export default function ExperimentsTable() {
+export default function ExperimentsTable({table}) {
     const {token} = React.useContext(AuthContext);
     const [columns, setColumns] = useState([]);
     const [data, setData] = useState([]);
     useEffect(() => {
         axiosConfig.headers.Authorization = "Bearer " + token;
-        axios.get("table/", axiosConfig).then(response => {
-            // columns are dynamically defined so we need the set of
-            // keys in all the experiments
+        axios.get("table/" + table, axiosConfig).then(response => {
+            // COLUMNS
             let columns = new Set();
-            // console.log(response.data);
-
-            Object.values(response.data).forEach(
-                item => Object.keys(item["json"]["network"]).forEach(key => {
-                    if (!["_id", "audios"].includes(key)) {
-                        columns.add(key)
-                    }
-                }));
+            response.data.view.forEach(col => {
+                columns.add(col.key);
+                if (col.visible) {
+                    initialVisibleColumns.push(col.key)
+                }
+                if (col.grouped) {
+                    initialGroupBy.push(col.key)
+                }
+            });
             columns = Array.from([...columns]);
             // format and prepend extra columns for the UI
             columns = columns.map(name => {
@@ -121,27 +158,51 @@ export default function ExperimentsTable() {
                             {row.isExpanded ?
                                 <i className={"fa fa-chevron-down"}/>
                                 : <i className={"fa fa-chevron-right"}/>}
-                        {(!row.cells.some(cell => cell.isGrouped) && row.original.hasOwnProperty("audios")) ?
+                        {(!row.cells.some(cell => cell.isGrouped) && row.original.audios) ?
                             ` (${row.original.audios.length.toString()})`
                             : null}
                         </span>
                 )
             });
             setColumns(columns);
-            initialVisibleColumns.push(...columns);
-            setData(Object.values(response.data).map(value => {
-                return {"audios": value["audios"], ...value["json"]["network"]}
+            setData(response.data.collections.map(coll => {
+                return {"audios": coll["blobs"] || [], ...coll}
             }));
         }).catch(err => {
         })
-    }, [token]);
-    const audios = {};
-    data.forEach((value, id) => audios[id] = value["audios"]);
-    // console.log(data);
+    }, [table, token]);
+    const updateData = (index, id, value) => {
+        data[index][id] = value;
+        setData([...data]);
+        console.log("EDITED", index, id, value)
+    };
+    const addEmptyRow = () => {
+        data.push({"audios": [], });
+        setData([...data]);
+    };
+    function AddRowIcon() {
+        return <i className={"fa fa-plus-circle"}
+                  onClick={addEmptyRow}
+                  style={{fontSize: "xx-large", padding: "8px"}}
+        />
+    }
+
+    const addBlob = (index, blob) => {
+        console.log(data[index]);
+        data[index].audios.push(blob);
+    };
+    const removeBlob = (index, blobIndex) => {
+        data[index].audios.splice(blobIndex, 1)
+    };
     const memoColumns = useMemo(() => columns, [columns]);
     const memoData = useMemo(() => data, [data]);
 
-    return (
-        <Table inputColumns={memoColumns} data={memoData}/>
-    )
+    return (<>
+        <Table inputColumns={memoColumns} data={memoData}
+               updateData={updateData}
+               addRowIcon={AddRowIcon}
+               addBlob={addBlob}
+               removeBlob={removeBlob}
+        />
+    </>)
 }

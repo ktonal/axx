@@ -17,7 +17,7 @@ const waveSurferOptions = ref => ({
     partialRender: false
 });
 
-export default function Waveform({url, title, path, handleFinish}) {
+export default function Waveform({url, title, path, handleFinish, remove}) {
     const {token} = React.useContext(AuthContext);
     const waveformRef = useRef(null);
     const wavesurfer = useRef(null);
@@ -106,7 +106,11 @@ export default function Waveform({url, title, path, handleFinish}) {
                    }}
                 />
                 <span className={"waveform-title"}>{"  " + title}</span>
-                {/*</a>*/}
+                <i className={"fa fa-times-circle"}
+                   style={{marginLeft: "auto", marginTop: "0",
+                       fontSize: "x-large", color: "gray"}}
+                   onClick={remove}
+                />
             </div>
             {/* the waveform (ui kit must be turned off for it to display correctly) */}
             <div className={"waveform"}
