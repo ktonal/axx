@@ -14,8 +14,8 @@ const axiosConfig = {
     "headers": {"Cache-Control": "no-store, no-cache", "Authorization": ""}
 };
 
-const initialGroupBy = [];
-const initialVisibleColumns = ["Audios"];
+let initialGroupBy = [];
+let initialVisibleColumns = ["Audios"];
 
 // Create an editable cell renderer
 const EditableCell = ({
@@ -25,7 +25,7 @@ const EditableCell = ({
                           updateData, // This is a custom function that we supplied to our table instance
                       }) => {
     // We need to keep and update the state of the cell normally
-    const [value, setValue] = React.useState(initialValue);
+    const [value, setValue] = React.useState("");
 
     const onChange = e => {
         setValue(e.target.value)
@@ -38,19 +38,22 @@ const EditableCell = ({
 
     // If the initialValue is changed external, sync it up with our state
     React.useEffect(() => {
-        setValue(initialValue)
+        setValue(initialValue ? initialValue : "")
     }, [initialValue]);
 
     return <input value={value} onChange={onChange} onBlur={onBlur} type={"text"}
-                  style={{color: "inherit", border: "0px", fontSize: "inherit"}}/>
+                  style={{color: "inherit", border: "0px", fontSize: "inherit", width: "75%"}}/>
 };
 
-const Table = ({inputColumns, data, updateData,
-                   addRowIcon, addBlob, removeBlob}) => {
-    // const initialHidden = inputColumns.filter(
-    //     c => c.id.toUpperCase() !== c.id && !initialVisibleColumns.includes(c.Header))
-    //     .map(c => c.id);
-    const initialHidden = [];
+const Table = ({
+                   inputColumns, data, updateData,
+                   addRowIcon, addBlob, removeBlob,
+                   skipReset
+               }) => {
+    const initialHidden = inputColumns.filter(
+        c => c.id.toUpperCase() !== c.id && !initialVisibleColumns.includes(c.Header))
+        .map(c => c.id);
+    // console.log("IN TABLE", inputColumns);
     const {
         getTableProps,
         getTableBodyProps,
@@ -72,6 +75,9 @@ const Table = ({inputColumns, data, updateData,
             defaultColumn: {
                 Cell: EditableCell,
             },
+            autoResetExpanded: !skipReset.current,
+            autoResetGroupBy: !skipReset.current,
+            autoResetSortBy: !skipReset.current,
             updateData
         },
         useColumnOrder,
@@ -81,15 +87,12 @@ const Table = ({inputColumns, data, updateData,
         useExpanded,
     );
 
-    const audioRowRenderer = React.useCallback(
-        ({row, colSpan}) => (
-            <AudioRow row={row} colSpan={colSpan}
-                      addBlob={addBlob}
-                      removeBlob={removeBlob}
-            />
-        ),
-        [addBlob, removeBlob]
-    );
+    const audioRowRenderer = ({row, colSpan}) => {
+        return <AudioRow row={row} colSpan={colSpan}
+                         addBlob={addBlob}
+                         removeBlob={removeBlob}
+        />
+    };
     return (
         <>
             <div className={"control-panel"}>
@@ -130,13 +133,75 @@ export default function ExperimentsTable({table}) {
     const {token} = React.useContext(AuthContext);
     const [columns, setColumns] = useState([]);
     const [data, setData] = useState([]);
+    const skipPageResetRef = React.useRef();
+
     useEffect(() => {
+        skipPageResetRef.current = false;
         axiosConfig.headers.Authorization = "Bearer " + token;
+        initialGroupBy = [];
+        initialVisibleColumns = ["Audios"];
+        // column for expanding/collapsing audios
+        const audiosColumn = {
+            Header: "Audios",
+            id: 'expander',
+            Cell: ({row}) => {
+                const deleteRow = () => {
+                    skipPageResetRef.current = true;
+                    if (window.confirm("Are you sure you want to delete this row?")) {
+                        const cascade = window.confirm("Do you wish to remove the associated audios from storage?");
+                        if (cascade) {
+                            row.original.blobs.forEach(blob => {
+                                axios.delete(
+                                    process.env.REACT_APP_BACKEND_URL + `/table/${table}/collections/${row.original.id}/blobs`,
+                                    {
+                                        headers: {
+                                            "Authorization": "Bearer " + token,
+                                            "Content-Type": "application/json"
+                                        },
+                                        data: {...blob}
+                                    },
+                                )
+                            })
+                        }
+                        axios.delete(
+                            process.env.REACT_APP_BACKEND_URL + `/table/${table}/collections/${row.original.id}`,
+                            {
+                                headers: {
+                                    "Authorization": "Bearer " + token,
+                                }
+                            },).then(response => {
+                            if (response.status === 200) {
+                                setData(data => {data.splice(row.index, 1); return [...data]});
+                            }})}
+                };
+                return <div className={"grouped-column"}
+                            style={{width: "100%", display: "block"}}>
+
+                    {(!row.cells.some(cell => cell.isGrouped) && row.original && row.original.blobs) ?
+                        <>{row.isExpanded ?
+                            <i className={"fa fa-chevron-down"}
+                               {...row.getToggleRowExpandedProps()}
+                            />
+                            : <i className={"fa fa-chevron-right"}
+                                 {...row.getToggleRowExpandedProps()}
+                            />}
+                            {` (${row.original.blobs.length.toString()})`}
+                            <i className={"remove-button fa fa-times-circle"}
+                               style={{float: "right"}}
+                               onClick={deleteRow}
+                            />
+                        </>
+                        : null}
+
+                </div>
+            }
+        };
         axios.get("table/" + table, axiosConfig).then(response => {
             // COLUMNS
-            let columns = new Set();
+            let newColumns = new Set();
+            // console.log("VIEW", response.data.view);
             response.data.view.forEach(col => {
-                columns.add(col.key);
+                newColumns.add(col.key);
                 if (col.visible) {
                     initialVisibleColumns.push(col.key)
                 }
@@ -144,42 +209,55 @@ export default function ExperimentsTable({table}) {
                     initialGroupBy.push(col.key)
                 }
             });
-            columns = Array.from([...columns]);
+            newColumns = Array.from([...newColumns]);
             // format and prepend extra columns for the UI
-            columns = columns.map(name => {
+            newColumns = newColumns.map(name => {
                 return {Header: name, accessor: name, id: name}
             });
-            // column for expanding/collapsing audios
-            columns.unshift({
-                Header: "Audios",
-                id: 'expander',
-                Cell: ({row}) => (
-                    <span {...row.getToggleRowExpandedProps()} className={"grouped-column"}>
-                            {row.isExpanded ?
-                                <i className={"fa fa-chevron-down"}/>
-                                : <i className={"fa fa-chevron-right"}/>}
-                        {(!row.cells.some(cell => cell.isGrouped) && row.original.audios) ?
-                            ` (${row.original.audios.length.toString()})`
-                            : null}
-                        </span>
-                )
-            });
-            setColumns(columns);
-            setData(response.data.collections.map(coll => {
-                return {"audios": coll["blobs"] || [], ...coll}
-            }));
+            setColumns([audiosColumn, ...newColumns]);
+            setData(response.data.collections);
         }).catch(err => {
+            console.log("LOAD TABLE", err.response.status, err.response.statusText, {...err})
         })
     }, [table, token]);
     const updateData = (index, id, value) => {
+        skipPageResetRef.current = true;
         data[index][id] = value;
         setData([...data]);
-        console.log("EDITED", index, id, value)
+        const collection = data[index];
+        axios.put(
+            process.env.REACT_APP_BACKEND_URL + `/table/${table}/collections/${data[index].id}`,
+            {...collection},
+            {
+                headers: {
+                    "Authorization": "Bearer " + token,
+                    "Content-Type": "application/json"
+                }
+            }
+        );
     };
     const addEmptyRow = () => {
-        data.push({"audios": [], });
-        setData([...data]);
+        skipPageResetRef.current = true;
+        const collection = columns.reduce((a, v) => ({...a, [v.Header]: ""}), {});
+        // let form = new FormData();
+        // form.append("collection", collection);
+        axios.post(
+            process.env.REACT_APP_BACKEND_URL + `/table/${table}/collections/`,
+            collection,
+            {
+                headers: {
+                    "Authorization": "Bearer " + token,
+                    "Content-Type": "application/json"
+                }
+            }
+        ).then(res => {
+            data.push(res.data);
+            setData([...data]);
+        }).catch(err => {
+            console.error(err)
+        })
     };
+
     function AddRowIcon() {
         return <i className={"fa fa-plus-circle"}
                   onClick={addEmptyRow}
@@ -188,11 +266,33 @@ export default function ExperimentsTable({table}) {
     }
 
     const addBlob = (index, blob) => {
-        console.log(data[index]);
-        data[index].audios.push(blob);
+        skipPageResetRef.current = true;
+        console.log("BLOB", blob);
+        const collectionId = data[index].id;
+        axios.post(
+            process.env.REACT_APP_BACKEND_URL + `/table/${table}/collections/${collectionId}/blobs`,
+            {...blob},
+            {headers: {"Authorization": "Bearer " + token, "Content-Type": "application/json"}}
+        ).then(res => {
+            data[index].blobs.push(res.data); // res.data == Blob
+            setData([...data]);
+        }).catch(err => console.error(err))
     };
     const removeBlob = (index, blobIndex) => {
-        data[index].audios.splice(blobIndex, 1)
+        skipPageResetRef.current = true;
+        const collectionId = data[index].id;
+        const blob = data[index].blobs[blobIndex];
+        axios.delete(
+            process.env.REACT_APP_BACKEND_URL + `/table/${table}/collections/${collectionId}/blobs`,
+            {
+                headers: {"Authorization": "Bearer " + token, "Content-Type": "application/json"},
+                data: {...blob}
+            },
+        ).then(resp => {
+                data[index].blobs.splice(blobIndex, 1);
+                setData([...data]);
+            }
+        )
     };
     const memoColumns = useMemo(() => columns, [columns]);
     const memoData = useMemo(() => data, [data]);
@@ -203,6 +303,7 @@ export default function ExperimentsTable({table}) {
                addRowIcon={AddRowIcon}
                addBlob={addBlob}
                removeBlob={removeBlob}
+               skipReset={skipPageResetRef}
         />
     </>)
 }

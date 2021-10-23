@@ -1,38 +1,62 @@
 import React from "react";
 import Waveform from "./Waveform";
+import axios from "axios";
+import {AuthContext} from "./Auth";
 
 export const AudioRow = React.memo(({row, colSpan, addBlob, removeBlob}) => {
-    const [audiosURLs, setAudiosUrls] = React.useState(row.original["audios"]);
-    React.useEffect(() => setAudiosUrls(row.original["audios"]), [row]);
+    const [audios, setAudios] = React.useState(row.original["blobs"]);
+    React.useEffect(() => setAudios(row.original["blobs"]), [row]);
+    const {token} = React.useContext(AuthContext);
     const addBlobCallback = () => {
-        addBlob(row.index, "123/com");
-        setAudiosUrls([...row.original.audios]);
+        const input = document.createElement("input");
+        input.type = 'file';
+        input.display = 'none';
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            let formData = new FormData();
+            formData.append("file", file);
+            axios.post(
+                process.env.REACT_APP_BACKEND_URL + "/bytes/",
+                formData,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                        "Authorization": "Bearer " + token
+                    }
+                }).then(res => {
+                    addBlob(row.index, res.data); // the Blob response
+                    setAudios([...row.original["blobs"]]);
+            });
+        };
+        document.body.appendChild(input);
+        input.click();
+        document.body.removeChild(input)
     };
     const removeBlobCallback = (index) => {
-        console.log("REMOVE", index);
         removeBlob(row.index, index);
-        setAudiosUrls([...row.original.audios]);
+        setAudios([...row.original.blobs]);
     };
+    const numAudios = audios.length;
     return <>
         <tr {...row.getRowProps()}>
             <td colSpan={colSpan} className={"audio-container"} align={"left"}>
                 <i className={"fa fa-plus-circle"}
-                   style={{fontSize: "xx-large", }}
+                   style={{fontSize: "xx-large",}}
                    onClick={addBlobCallback}/>
                 <div>
-                    {audiosURLs ?
-                        audiosURLs.map((x, i) => {
-                            const splitedPath = x.split("/");
+                    {audios ?
+                        audios.map((audioBlob, i) => {
                             return (<Waveform
                                 key={i}
-                                url={process.env.REACT_APP_BACKEND_URL + "/bytes/" + x}
-                                path={x}
-                                title={splitedPath[splitedPath.length - 1]}
+                                url={process.env.REACT_APP_BACKEND_URL + "/bytes/" + audioBlob.path + "?bucket=" + audioBlob.bucket}
+                                path={audioBlob.path}
+                                title={audioBlob.name}
+                                bucket={audioBlob.bucket}
+                                width={`${Math.floor(100/Math.min(5, numAudios)) - 2}%`}
                                 handleFinish={() => {
-                                    const list = audiosURLs;
-                                    const index = list.indexOf(x) + 1;
-                                    if (index < list.length) {
-                                        const id = list[index].split("/")[splitedPath.length - 1];
+                                    const index = audios.indexOf(audioBlob) + 1;
+                                    if (index < audios.length) {
+                                        const id = audios[index].name;
                                         const element = document.getElementById("play-" + id);
                                         element.click()
                                     }

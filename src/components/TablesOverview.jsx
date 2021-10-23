@@ -17,9 +17,9 @@ export default function TablesOverview(props) {
             })
     }, [token, setTables]);
     return (
-        <div>
+        <div className={"table-list"}>
             {tables.map((name, i) =>
-                <ul key={i} onClick={() => setCurrentTable(name)}>{name}</ul>
+                <div className={"table-list-item"} key={i} onClick={() => setCurrentTable(name)}>{name}</div>
             )}
         </div>
     )

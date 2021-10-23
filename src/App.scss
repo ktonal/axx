@@ -46,6 +46,20 @@ html {
       background: #fff;
     }
 
+    .table-list {
+      padding: 12px;
+      text-align: center;
+
+      .table-list-item {
+        margin: 12px;
+        padding: 12px;
+        cursor: pointer;
+        font-weight: bold;
+        text-decoration: underline;
+
+      }
+    }
+
   }
 }
 
@@ -114,6 +128,7 @@ html {
 table {
   position: relative;
   min-width: 98%;
+  max-width: 98%;
   border-collapse: separate; /* Don't collapse */
   border-spacing: 0;
 }
@@ -181,8 +196,16 @@ table td {
   cursor: pointer;
 }
 
+.fa-plus-circle {
+  color: rgba(0, 160, 0, 0.73);
+}
+
+.fa-times-circle {
+  color: rgba(210, 65, 58, 0.64);
+}
+
 .audio-container {
-  max-width: 100px;
+  //max-width: 100px;
 }
 
 hr {
@@ -194,11 +217,11 @@ hr {
   display: grid;
   height: 100px;
   float: left;
-  margin: .25em;
+  margin: .05em;
   border: $borders;
   padding: 5px;
   border-radius: 15px;
-  min-width: 200px;
+  //min-width: 200px;
 
 }
 
@@ -212,7 +235,7 @@ hr {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  padding-left: 5px;
+  padding: 0 5px;
 }
 
 .play-button {

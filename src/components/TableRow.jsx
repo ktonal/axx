@@ -35,7 +35,7 @@ function FormatedCell(props) {
             {props.row.isExpanded ? <i className={"fa fa-chevron-down"}/> :
                 <i className={"fa fa-chevron-right"}/>}
           </span>{" "}
-                {props.cell.render("Cell")} ({props.row.subRows.length})
+            {props.cell.render("Cell")} ({props.row.subRows.length})
             </>
         ) : props.cell.isAggregated ? (
             // If the cell is aggregated, use the Aggregated

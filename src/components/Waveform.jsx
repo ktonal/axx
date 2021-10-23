@@ -10,14 +10,14 @@ const waveSurferOptions = ref => ({
     cursorColor: "#6996e6",
     barWidth: 1,
     barHeight: 4,
-    maxCanvasWidth: 200,
+    // maxCanvasWidth: null,
     responsive: true,
     height: 50,
     // Use the PeakCache to improve rendering speed of large waveforms.
     partialRender: false
 });
 
-export default function Waveform({url, title, path, handleFinish, remove}) {
+export default function Waveform({url, title, path, bucket, width, handleFinish, remove}) {
     const {token} = React.useContext(AuthContext);
     const waveformRef = useRef(null);
     const wavesurfer = useRef(null);
@@ -67,7 +67,8 @@ export default function Waveform({url, title, path, handleFinish, remove}) {
 
     return (
         // the container
-        <div className={"waveform-element"}>
+        <div className={"waveform-element"}
+             style={{minWidth: width}}>
             {/* the header */}
             <div className={"waveform-header"}>
                 <i className={"play-button fa " + (playing ? "fa-pause-circle" : "fa-play-circle-o")}
@@ -93,6 +94,11 @@ export default function Waveform({url, title, path, handleFinish, remove}) {
                        })
                    }}
                 />
+                <a href={`https://console.cloud.google.com/storage/browser/_details/${bucket}/${path};tab=live_object?authuser=1`}>
+                    <i className={"link-button fa fa-link"}
+                   style={{fontSize: "x-large", color: "#d1d7ac"}}
+                   />
+                </a>
                 <i className={"trash-button fa fa-trash"}
                    style={{padding: "0 6px", fontSize: "x-large", color: "#d78377"}}
                    onClick={() => {
@@ -106,9 +112,8 @@ export default function Waveform({url, title, path, handleFinish, remove}) {
                    }}
                 />
                 <span className={"waveform-title"}>{"  " + title}</span>
-                <i className={"fa fa-times-circle"}
-                   style={{marginLeft: "auto", marginTop: "0",
-                       fontSize: "x-large", color: "gray"}}
+                <i className={"remove-button fa fa-times-circle"}
+                   style={{margin: "0 4px 0 auto", fontSize: "x-large"}}
                    onClick={remove}
                 />
             </div>
