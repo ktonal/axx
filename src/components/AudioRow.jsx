@@ -10,22 +10,24 @@ export const AudioRow = React.memo(({row, colSpan, addBlob, removeBlob}) => {
     const addBlobCallback = () => {
         const input = document.createElement("input");
         input.type = 'file';
+        input.multiple = true;
         input.display = 'none';
         input.onchange = (e) => {
-            const file = e.target.files[0];
-            let formData = new FormData();
-            formData.append("file", file);
-            axios.post(
-                process.env.REACT_APP_BACKEND_URL + "/bytes/",
-                formData,
-                {
-                    headers: {
-                        "Content-Type": "multipart/form-data",
-                        "Authorization": "Bearer " + token
-                    }
-                }).then(res => {
+            Array.from(e.target.files).forEach(file => {
+                let formData = new FormData();
+                formData.append("file", file);
+                axios.post(
+                    process.env.REACT_APP_BACKEND_URL + "/bytes/",
+                    formData,
+                    {
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                            "Authorization": "Bearer " + token
+                        }
+                    }).then(res => {
                     addBlob(row.index, res.data); // the Blob response
                     setAudios([...row.original["blobs"]]);
+                });
             });
         };
         document.body.appendChild(input);
@@ -52,7 +54,7 @@ export const AudioRow = React.memo(({row, colSpan, addBlob, removeBlob}) => {
                                 path={audioBlob.path}
                                 title={audioBlob.name}
                                 bucket={audioBlob.bucket}
-                                width={`${Math.floor(100/Math.min(5, numAudios)) - 2}%`}
+                                width={`${Math.floor(100 / Math.min(5, numAudios)) - 2}%`}
                                 handleFinish={() => {
                                     const index = audios.indexOf(audioBlob) + 1;
                                     if (index < audios.length) {

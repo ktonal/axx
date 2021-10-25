@@ -242,7 +242,7 @@ export default function ExperimentsTable({table}) {
         // let form = new FormData();
         // form.append("collection", collection);
         axios.post(
-            process.env.REACT_APP_BACKEND_URL + `/table/${table}/collections/`,
+            process.env.REACT_APP_BACKEND_URL + `/table/${table}/collections`,
             collection,
             {
                 headers: {
@@ -283,7 +283,7 @@ export default function ExperimentsTable({table}) {
         const collectionId = data[index].id;
         const blob = data[index].blobs[blobIndex];
         axios.delete(
-            process.env.REACT_APP_BACKEND_URL + `/table/${table}/collections/${collectionId}/blobs`,
+            process.env.REACT_APP_BACKEND_URL + `/table/${table}/collections/${collectionId}/blobs?bucket=${blob.bucket}`,
             {
                 headers: {"Authorization": "Bearer " + token, "Content-Type": "application/json"},
                 data: {...blob}
