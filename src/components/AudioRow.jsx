@@ -3,7 +3,7 @@ import Waveform from "./Waveform";
 import axios from "axios";
 import {AuthContext} from "./Auth";
 
-export const AudioRow = React.memo(({row, colSpan, addBlob, removeBlob}) => {
+export const AudioRow = React.memo(({row, colSpan, addBlob: addBlobs, removeBlob}) => {
     const [audios, setAudios] = React.useState(row.original["blobs"]);
     React.useEffect(() => setAudios(row.original["blobs"]), [row]);
     const {token} = React.useContext(AuthContext);
@@ -13,10 +13,12 @@ export const AudioRow = React.memo(({row, colSpan, addBlob, removeBlob}) => {
         input.multiple = true;
         input.display = 'none';
         input.onchange = (e) => {
+            var promises = [];
+            const blobs = [];
             Array.from(e.target.files).forEach(file => {
                 let formData = new FormData();
                 formData.append("file", file);
-                axios.post(
+                promises.push(axios.post(
                     process.env.REACT_APP_BACKEND_URL + "/bytes/",
                     formData,
                     {
@@ -25,10 +27,13 @@ export const AudioRow = React.memo(({row, colSpan, addBlob, removeBlob}) => {
                             "Authorization": "Bearer " + token
                         }
                     }).then(res => {
-                    addBlob(row.index, res.data); // the Blob response
-                    setAudios([...row.original["blobs"]]);
-                });
+                    blobs.push(res.data);
+                }))
             });
+            Promise.all(promises).then(() => {
+                    addBlobs(row.index, blobs); // the Blob response
+                    setAudios([...row.original["blobs"]]);
+                })
         };
         document.body.appendChild(input);
         input.click();

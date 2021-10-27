@@ -17,7 +17,7 @@ const waveSurferOptions = ref => ({
     partialRender: false
 });
 
-export default function Waveform({url, title, path, bucket, width, handleFinish, remove}) {
+export default function Waveform({url, title, path, bucket, width, handleFinish, remove: removeFromList}) {
     const {token} = React.useContext(AuthContext);
     const waveformRef = useRef(null);
     const wavesurfer = useRef(null);
@@ -82,7 +82,8 @@ export default function Waveform({url, title, path, bucket, width, handleFinish,
                            {
                                headers: {
                                    "Authorization": "Bearer " + token
-                               }
+                               },
+                               responseType: "arraybuffer"
                            }).then(res => {
                            const url = window.URL.createObjectURL(new Blob([res.data]));
                            const link = document.createElement('a');
@@ -103,18 +104,18 @@ export default function Waveform({url, title, path, bucket, width, handleFinish,
                    style={{padding: "0 6px", fontSize: "x-large", color: "#d78377"}}
                    onClick={() => {
                        if (window.confirm("Are you sure you want to delete this?")) {
-                           axios.delete(process.env.REACT_APP_BACKEND_URL + path, {
+                           axios.delete(url, {
                                headers: {
                                    "Authorization": "Bearer " + token
                                }
-                           })
+                           }).then(() => removeFromList())
                        }
                    }}
                 />
                 <span className={"waveform-title"}>{"  " + title}</span>
                 <i className={"remove-button fa fa-times-circle"}
                    style={{margin: "0 4px 0 auto", fontSize: "x-large"}}
-                   onClick={remove}
+                   onClick={removeFromList}
                 />
             </div>
             {/* the waveform (ui kit must be turned off for it to display correctly) */}

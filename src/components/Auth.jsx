@@ -14,7 +14,7 @@ export function Login(props) {
     };
     const onFailure = (res) => {
         props.setToken(false);
-        console.log(res)
+        console.error(res)
     };
     return (
         <div>

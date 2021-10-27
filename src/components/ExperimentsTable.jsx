@@ -148,21 +148,6 @@ export default function ExperimentsTable({table}) {
                 const deleteRow = () => {
                     skipPageResetRef.current = true;
                     if (window.confirm("Are you sure you want to delete this row?")) {
-                        const cascade = window.confirm("Do you wish to remove the associated audios from storage?");
-                        if (cascade) {
-                            row.original.blobs.forEach(blob => {
-                                axios.delete(
-                                    process.env.REACT_APP_BACKEND_URL + `/table/${table}/collections/${row.original.id}/blobs`,
-                                    {
-                                        headers: {
-                                            "Authorization": "Bearer " + token,
-                                            "Content-Type": "application/json"
-                                        },
-                                        data: {...blob}
-                                    },
-                                )
-                            })
-                        }
                         axios.delete(
                             process.env.REACT_APP_BACKEND_URL + `/table/${table}/collections/${row.original.id}`,
                             {
@@ -171,8 +156,13 @@ export default function ExperimentsTable({table}) {
                                 }
                             },).then(response => {
                             if (response.status === 200) {
-                                setData(data => {data.splice(row.index, 1); return [...data]});
-                            }})}
+                                setData(data => {
+                                    data.splice(row.index, 1);
+                                    return [...data]
+                                });
+                            }
+                        })
+                    }
                 };
                 return <div className={"grouped-column"}
                             style={{width: "100%", display: "block"}}>
@@ -217,7 +207,7 @@ export default function ExperimentsTable({table}) {
             setColumns([audiosColumn, ...newColumns]);
             setData(response.data.collections);
         }).catch(err => {
-            console.log("LOAD TABLE", err.response.status, err.response.statusText, {...err})
+            console.log("LOAD TABLE ERROR", err.response.status, err.response.statusText, {...err})
         })
     }, [table, token]);
     const updateData = (index, id, value) => {
@@ -265,16 +255,17 @@ export default function ExperimentsTable({table}) {
         />
     }
 
-    const addBlob = (index, blob) => {
+    const addBlobs = (index, blobs) => {
         skipPageResetRef.current = true;
-        console.log("BLOB", blob);
+        let formData = new FormData();
+        formData.append("blobs", blobs);
         const collectionId = data[index].id;
         axios.post(
             process.env.REACT_APP_BACKEND_URL + `/table/${table}/collections/${collectionId}/blobs`,
-            {...blob},
+            {blobs: [...blobs]},
             {headers: {"Authorization": "Bearer " + token, "Content-Type": "application/json"}}
         ).then(res => {
-            data[index].blobs.push(res.data); // res.data == Blob
+            data[index].blobs = [...res.data]; // res.data == Blobs
             setData([...data]);
         }).catch(err => console.error(err))
     };
@@ -301,7 +292,7 @@ export default function ExperimentsTable({table}) {
         <Table inputColumns={memoColumns} data={memoData}
                updateData={updateData}
                addRowIcon={AddRowIcon}
-               addBlob={addBlob}
+               addBlob={addBlobs}
                removeBlob={removeBlob}
                skipReset={skipPageResetRef}
         />
